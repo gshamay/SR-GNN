@@ -14,6 +14,9 @@ import operator
 import datetime
 import os
 
+#todo: [GS] added heades in youchoose clicks - session_id,timestamp,item_id,ccategory
+#todo: [GS] add here end of session nodes EOS
+#todo: should we look for the eos as a standard node ? change the validation to include last session, w/o the eos  ?
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
 opt = parser.parse_args()
@@ -94,7 +97,8 @@ length = len(sess_clicks)
 for s in list(sess_clicks):
     curseq = sess_clicks[s]
     filseq = list(filter(lambda i: iid_counts[i] >= 5, curseq))
-    if len(filseq) < 2:
+    if len(filseq) < 2:#todo: [GS] keep only ids that were clicked 5 times or more
+        #todo: [GS] filter out sessions that has less then 2 clics that appeard less then 5 times (session become len 1)
         del sess_clicks[s]
         del sess_date[s]
     else:

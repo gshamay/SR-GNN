@@ -1,0 +1,1 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe C:\Users\gshamay.DALET\PycharmProjects\RS\Project\SR-GNN\datasets\preprocess.py --dataset sample

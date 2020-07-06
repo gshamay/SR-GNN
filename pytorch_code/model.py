@@ -9,7 +9,7 @@ Created on July, 2018
 import datetime
 import math
 import numpy as np
-import torch
+import torch #todo: [GS] requier installation
 from torch import nn
 from torch.nn import Module, Parameter
 import torch.nn.functional as F
@@ -147,7 +147,7 @@ def train_test(model, train_data, test_data):
         sub_scores = scores.topk(20)[1]
         sub_scores = trans_to_cpu(sub_scores).detach().numpy()
         for score, target, mask in zip(sub_scores, targets, test_data.mask):
-            hit.append(np.isin(target - 1, score))
+            hit.append(np.isin(target - 1, score))# todo: [GS] what is target-1
             if len(np.where(score == target - 1)[0]) == 0:
                 mrr.append(0)
             else:

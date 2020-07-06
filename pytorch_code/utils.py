@@ -69,7 +69,7 @@ class Data():
             np.random.shuffle(shuffled_arg)
             self.inputs = self.inputs[shuffled_arg]
             self.mask = self.mask[shuffled_arg]
-            self.targets = self.targets[shuffled_arg]
+            self.targets = self.targets[shuffled_arg] #existing targets
         n_batch = int(self.length / batch_size)
         if self.length % batch_size != 0:
             n_batch += 1
