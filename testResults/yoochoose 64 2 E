@@ -1,0 +1,32 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py --dataset yoochoose1_64 --epoch 2
+Namespace(batchSize=100, dataset='yoochoose1_64', epoch=2, hiddenSize=100, l2=1e-05, lr=0.001, lr_dc=0.1, lr_dc_step=3, nonhybrid=False, patience=10, step=1, valid_portion=0.1, validation=False)
+C:\pycharmEnv\pythin37x64Env\lib\site-packages\torch\optim\lr_scheduler.py:123: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate", UserWarning)
+-------------------------------------------------------
+epoch:  0
+start training:  2020-07-09 18:50:37.497442
+[0/3699] Loss: 10.5328
+[740/3699] Loss: 6.6555
+[1480/3699] Loss: 5.5347
+[2220/3699] Loss: 5.7148
+[2960/3699] Loss: 5.4082
+	Loss:	21877.195
+start predicting:  2020-07-09 19:44:26.199067
+Best Result:
+	Recall@20:	65.0900	MMR@20:	26.9011	Epoch:	0,	0
+-------------------------------------------------------
+epoch:  1
+start training:  2020-07-09 19:46:26.090070
+[0/3699] Loss: 4.3912
+[740/3699] Loss: 4.6955
+[1480/3699] Loss: 4.5863
+[2220/3699] Loss: 4.4815
+[2960/3699] Loss: 4.6469
+	Loss:	16865.561
+start predicting:  2020-07-09 20:46:19.095222
+Best Result:
+	Recall@20:	68.2797	MMR@20:	28.8452	Epoch:	1,	1
+-------------------------------------------------------
+Run time: 7055.304360 s
+
+Process finished with exit code 0
