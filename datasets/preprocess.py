@@ -158,9 +158,9 @@ item_dict = {}
 
 # Convert training sessions to sequences and renumber items to start from 1
 def obtian_tra():
-    train_ids = []
-    train_seqs = []
-    train_dates = []
+    train_ids = []  # the sessions/seq ids
+    train_seqs = []  # the seqs after the convert
+    train_dates = []  # all sessions dates
     item_ctr = 1
     for s, date in tra_sess:
         seq = sess_clicks[s]
@@ -171,7 +171,7 @@ def obtian_tra():
                 outseq += [item_dict[i]]
             else:
                 outseq += [item_ctr]
-                item_dict[i] = item_ctr  # add the new item id to the dic (origItemID--> new ID)
+                item_dict[i] = item_ctr  # add the new item id to the dic (origItemID --> new ID)
                 item_ctr += 1  # prepare the next new item id
         if len(outseq) < 2:  # Doesn't occur
             continue  # doesn't suppose to get here - bcz we filtered out all short sessions before
@@ -179,7 +179,7 @@ def obtian_tra():
         train_dates += [date]
         train_seqs += [outseq]
     printDebug("number of items[" + str(item_ctr) + "]")  # 43098, 37484
-    #todo: Add here num of Session End items
+    # todo: Add here num of Session End items
     return train_ids, train_dates, train_seqs
 
 
@@ -219,22 +219,25 @@ def process_seqs(iseqs, idates):
             labs += [tar]
             out_seqs += [seq[:-i]]
             out_dates += [date]
-            ids += [id]
+            ids += [id]     # The same session ID can be added a few times - once for each sub seq
+                            #  But those are new Session IDS now
     return out_seqs, out_dates, labs, ids
 
 
+# generate new Seq based on all sub seq of the given seq --> todo: We can HERE our improvement
 trainSeqNumBefore = (len(tra_seqs))
 testSeqNumBefore = (len(tes_seqs))
-# generate new Seq based on all sub seq of the given seq --> We can HERE our improvement
 tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
 te_seqs, te_dates, te_labs, te_ids = process_seqs(tes_seqs, tes_dates)
 tra = (tr_seqs, tr_labs)
 tes = (te_seqs, te_labs)
 printDebug("Train size : before addiongSubSeq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
 printDebug("Test  size : before addiongSubSeq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
+
 printDebug("Examples:")
 printDebug(str(tr_seqs[:3]) + "," + str(tr_dates[:3]) + str(tr_labs[:3]))  # example for train
 printDebug(str(te_seqs[:3]) + "," + str(te_dates[:3]) + "," + str(te_labs[:3]))  # example for test
+
 all = 0
 allTarin = 0
 allTest = 0
@@ -247,7 +250,7 @@ for seq in tes_seqs:
     all += len(seq)
     allTest += len(seq)
 
-printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))
+printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  #todo: those values are BEFORE adding the sub Seqs
 printDebug('avg Test: ' + str(allTest / (len(tes_seqs) * 1.0)))
 printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0)))
 
@@ -267,9 +270,8 @@ elif opt.dataset == 'yoochoose':
 
     # use only the last 1/4 of yoochoose @ yoochoose1_4 and 1/64 in yoochoose1_64
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
-    printDebug(str(len(tr_seqs[-split4:])))
-    printDebug(str(len(tr_seqs[-split64:])))
-
+    printDebug("1/4  db - train seq " + str(split4))
+    printDebug("1/64 db - train seq " + str(split64))
     tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:]), (tr_seqs[-split64:], tr_labs[-split64:])
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
@@ -285,8 +287,12 @@ else:
     pickle.dump(tra, open('sample/train.txt', 'wb'))
     pickle.dump(tes, open('sample/test.txt', 'wb'))
     pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))
+    # todo: Why do we keep the tra_seqs? (the original seq before the sub seq)
+    #  Not sure how they could be used. We can see that they are not in use by the main
 
 End = datetime.datetime.now()
 dateString = End.strftime("%Y-%m-%d-%H-%M-%S")
 printDebug('Done @' + dateString + " took " + str(End - Start))
 printToFile("./../testResults/preprocess_" + opt.dataset + dateString + ".log")
+
+# todo: not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids
