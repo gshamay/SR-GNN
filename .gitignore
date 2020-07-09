@@ -17,3 +17,9 @@ datasets/sample/all_train_seq.txt
 .idea/modules.xml
 .idea/SR-GNN.iml
 .idea/vcs.xml
+datasets/yoochoose1_4_/all_train_seq.txt
+datasets/yoochoose1_4_/test.txt
+datasets/yoochoose1_4_/train.txt
+datasets/yoochoose1_64_/all_train_seq.txt
+datasets/yoochoose1_64_/test.txt
+datasets/yoochoose1_64_/train.txt

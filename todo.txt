@@ -13,18 +13,22 @@ Time OF run
     get diginetica - prepare and run
 
 Add improvement
-    Check where the tested node is selected -  data Preparation - or test
+    Done - in the data prep / where adding sub seq - Check where the tested node is selected -  data Preparation - or test
     add the nodes in the train
-    add an option to OK EOS node in teh validation
+    add an option to OK EOS node in the validation
+    how o identify EOS items ?
+        negative item ids ?
+    how many EOS items to add
+        add a few options and test Learn this
     how to compare results
         check that we have the same error on test w/o last click ?
-        test on all data, and add constant error for the last click when running w/o improvement ?
+        test on all data, and add constant error for the last click when running w/o improvement ? (bcz it is always wrong / had no way 'to be correct' (mainly in online mode)
     Where to add the new items ?
         in train only  ?
-        in teest and train ?
+        in test and train ?
 
 general dev
-    Add print to file
+    Done - Add print to file
     make TF run
 
 to understand

@@ -13,6 +13,9 @@ import pickle
 import operator
 import datetime
 import os
+from enum import Enum
+
+from printDebug import *
 
 # todo: [GS] added heades in youchoose clicks - session_id,timestamp,item_id,ccategory
 # todo: [GS] add here end of session nodes EOS
@@ -20,7 +23,7 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
 opt = parser.parse_args()
-print(opt)
+printDebug("opt=" + str(opt))
 
 dataset = 'sample_train-item-views.csv'
 if opt.dataset == 'diginetica':
@@ -28,7 +31,10 @@ if opt.dataset == 'diginetica':
 elif opt.dataset == 'yoochoose':
     dataset = 'yoochoose-clicks.dat'
 
-print("-- Starting @ %ss" % datetime.datetime.now())
+Start = datetime.datetime.now()
+dateString = Start.strftime("%Y-%m-%d-%H%M%S")
+printDebug('-- Starting @' + dateString)
+
 with open(dataset, "r") as f:
     if opt.dataset == 'yoochoose':
         reader = csv.DictReader(f, delimiter=',')
@@ -40,7 +46,7 @@ with open(dataset, "r") as f:
     curid = -1
     curdate = None
 
-    print("create sess_clicks - session id --> Click and times ; and sess_date session id --> session date")
+    printDebug("create sess_clicks - session id --> Click and times ; and sess_date session id --> session date")
     for data in reader:
         sessid = data['session_id']
         if curdate and not curid == sessid:
@@ -74,14 +80,14 @@ with open(dataset, "r") as f:
         date = time.mktime(time.strptime(curdate[:19], '%Y-%m-%dT%H:%M:%S'))
     else:
         date = time.mktime(time.strptime(curdate, '%Y-%m-%d'))
-        print("modify sess_clicks - session id --> Click sorted by their times (without the time info)")
+        printDebug("modify sess_clicks - session id --> Click sorted by their times (without the time info)")
         for i in list(sess_clicks):
             sorted_clicks = sorted(sess_clicks[i], key=operator.itemgetter(1))
             sess_clicks[i] = [c[0] for c in sorted_clicks]
 
     # todo: [GS] it is needed run only at the last session - bcz the last session date is not set (bcz there is no 'session switch')
     sess_date[curid] = date
-print("-- Reading data @ %ss" % datetime.datetime.now())
+printDebug("-- Reading data @ %ss" % datetime.datetime.now())
 
 # Filter out length 1 sessions
 for s in list(sess_clicks):
@@ -113,10 +119,10 @@ for s in list(sess_clicks):
     else:
         sess_clicks[s] = filseq
 
-print("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
-      + "after[" + str(len(sess_clicks)) + "]"
-      + "filteredOutSeq[" + str(filteredOutSeq) + "]"
-      )
+printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
+           + "after[" + str(len(sess_clicks)) + "]"
+           + "filteredOutSeq[" + str(filteredOutSeq) + "]"
+           )
 
 # Split out test set based on dates
 dates = list(sess_date.items())
@@ -133,18 +139,18 @@ if opt.dataset == 'yoochoose':
 else:
     splitdate = maxdate - 86400 * 7
 
-print('Splitting train/test date', splitdate)  # Yoochoose: ('Split date', 1411930799.0)
+printDebug('Splitting train/test date' + str(splitdate))  # Yoochoose: ('Split date', 1411930799.0)
 tra_sess = filter(lambda x: x[1] < splitdate, dates)
 tes_sess = filter(lambda x: x[1] > splitdate, dates)
 
 # Sort sessions by date
 tra_sess = sorted(tra_sess, key=operator.itemgetter(1))  # [(session_id, timestamp), (), ]
 tes_sess = sorted(tes_sess, key=operator.itemgetter(1))  # [(session_id, timestamp), (), ]
-print("train sessions[" + str(len(tra_sess)) + "]")  # 186670    # 7966257
-print("test  sessions[" + str(len(tes_sess)) + "]")  # 15979     # 15324
-print(str(tra_sess[:3]) + "the first 3 sessions that will be used for train - out of [" + str(len(tra_sess)) + "]")
-print(str(tes_sess[:3]) + "the first 3 sessions that will be used for test - out of [" + str(len(tes_sess)) + "]")
-print("-- Splitting train set and test set @ %ss" % datetime.datetime.now())
+printDebug("train sessions[" + str(len(tra_sess)) + "]")  # 186670    # 7966257
+printDebug("test  sessions[" + str(len(tes_sess)) + "]")  # 15979     # 15324
+printDebug(str(tra_sess[:3]) + "the first 3 sessions that will be used for train - out of [" + str(len(tra_sess)) + "]")
+printDebug(str(tes_sess[:3]) + "the first 3 sessions that will be used for test - out of [" + str(len(tes_sess)) + "]")
+printDebug("-- Splitting train set and test set @ %ss" % datetime.datetime.now())
 
 # Choosing item count >=5 gives approximately the same number of items as reported in paper
 item_dict = {}
@@ -172,7 +178,8 @@ def obtian_tra():
         train_ids += [s]
         train_dates += [date]
         train_seqs += [outseq]
-    print("number of items[" + str(item_ctr) + "]")  # 43098, 37484
+    printDebug("number of items[" + str(item_ctr) + "]")  # 43098, 37484
+    #todo: Add here num of Session End items
     return train_ids, train_dates, train_seqs
 
 
@@ -188,7 +195,7 @@ def obtian_tes():
             if i in item_dict:  # if item is NOT in the dic of the items in the train --> it is ignored
                 outseq += [item_dict[i]]
             # else:
-            #     print("item not in the train dictionary-->ignored [" + i + "]")
+            #     printDebug("item not in the train dictionary-->ignored [" + i + "]")
         if len(outseq) < 2:
             continue  # we can get here, bcz we filtered out items that are not in the training
         test_ids += [s]
@@ -223,11 +230,11 @@ tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
 te_seqs, te_dates, te_labs, te_ids = process_seqs(tes_seqs, tes_dates)
 tra = (tr_seqs, tr_labs)
 tes = (te_seqs, te_labs)
-print("Train size : before addiongSubSeq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
-print("Test  size : before addiongSubSeq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
-print("Examples:")
-print(tr_seqs[:3], tr_dates[:3], tr_labs[:3])  # example for train
-print(te_seqs[:3], te_dates[:3], te_labs[:3])  # example for test
+printDebug("Train size : before addiongSubSeq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
+printDebug("Test  size : before addiongSubSeq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
+printDebug("Examples:")
+printDebug(str(tr_seqs[:3]) + "," + str(tr_dates[:3]) + str(tr_labs[:3]))  # example for train
+printDebug(str(te_seqs[:3]) + "," + str(te_dates[:3]) + "," + str(te_labs[:3]))  # example for test
 all = 0
 allTarin = 0
 allTest = 0
@@ -240,9 +247,9 @@ for seq in tes_seqs:
     all += len(seq)
     allTest += len(seq)
 
-print('avg Train: ', allTarin / (len(tra_seqs) * 1.0))
-print('avg Test: ', allTest / (len(tes_seqs) * 1.0))
-print('avg length - all: ', all / (len(tra_seqs) + len(tes_seqs) * 1.0))
+printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))
+printDebug('avg Test: ' + str(allTest / (len(tes_seqs) * 1.0)))
+printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0)))
 
 if opt.dataset == 'diginetica':
     if not os.path.exists('diginetica'):
@@ -260,8 +267,8 @@ elif opt.dataset == 'yoochoose':
 
     # use only the last 1/4 of yoochoose @ yoochoose1_4 and 1/64 in yoochoose1_64
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
-    print(len(tr_seqs[-split4:]))
-    print(len(tr_seqs[-split64:]))
+    printDebug(str(len(tr_seqs[-split4:])))
+    printDebug(str(len(tr_seqs[-split64:])))
 
     tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:]), (tr_seqs[-split64:], tr_labs[-split64:])
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
@@ -279,4 +286,7 @@ else:
     pickle.dump(tes, open('sample/test.txt', 'wb'))
     pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))
 
-print('Done.')
+End = datetime.datetime.now()
+dateString = End.strftime("%Y-%m-%d-%H-%M-%S")
+printDebug('Done @' + dateString + " took " + str(End - Start))
+printToFile("./../testResults/preprocess_" + opt.dataset + dateString + ".log")
