@@ -1,0 +1,32 @@
+possible Bias?
+    Done- No always predict the last node
+
+get more info
+    mail other papers writers - how they do the online predict - does it always on the last node as well ?
+    check other papers evaluations - do they add info about how they generate seq data, how they test and evaluate ?
+
+Time OF run
+    Check with Bracha = possibility to get a machine with GPU/ how to run with GPU ?
+    Tool long even on yoochoose 1/64
+    ? Run yoochoose with TS vs pytorch - time f Run ; Problem - TF dees not run
+    Consider less epoches then the default ; default --epoch 30
+    get diginetica - prepare and run
+
+Add improvement
+    Check where the tested node is selected -  data Preparation - or test
+    add the nodes in the train
+    add an option to OK EOS node in teh validation
+    how to compare results
+        check that we have the same error on test w/o last click ?
+        test on all data, and add constant error for the last click when running w/o improvement ?
+    Where to add the new items ?
+        in train only  ?
+        in teest and train ?
+
+general dev
+    Add print to file
+    make TF run
+
+to understand
+    What is the loss vs the recall and the mmr
+
