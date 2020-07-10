@@ -25,9 +25,13 @@ parser.add_argument('--dataset', default='sample', help='dataset name: diginetic
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
+session_id = 'session_id'
+item_id = 'item_id'
 dataset = 'sample_train-item-views.csv'
 if opt.dataset == 'diginetica':
     dataset = 'train-item-views.csv'
+    session_id = 'sessionId'
+    item_id = 'itemId'
 elif opt.dataset == 'yoochoose':
     dataset = 'yoochoose-clicks.dat'
 
@@ -48,7 +52,7 @@ with open(dataset, "r") as f:
 
     printDebug("create sess_clicks - session id --> Click and times ; and sess_date session id --> session date")
     for data in reader:
-        sessid = data['session_id']
+        sessid = data[session_id]
         if curdate and not curid == sessid:
             # sesssion switch detected
             date = ''
@@ -59,9 +63,9 @@ with open(dataset, "r") as f:
             sess_date[curid] = date  # set the date of the session when there is a session switch
         curid = sessid
         if opt.dataset == 'yoochoose':
-            item = data['item_id']
+            item = data[item_id]
         else:
-            item = data['item_id'], int(data['timeframe'])
+            item = data[item_id], int(data['timeframe'])
         curdate = ''
         if opt.dataset == 'yoochoose':
             curdate = data['timestamp']

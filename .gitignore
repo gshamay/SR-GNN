@@ -23,3 +23,12 @@ datasets/yoochoose1_4_/train.txt
 datasets/yoochoose1_64_/all_train_seq.txt
 datasets/yoochoose1_64_/test.txt
 datasets/yoochoose1_64_/train.txt
+datasets/product-categories.csv
+datasets/products.csv
+datasets/train-clicks.csv
+datasets/train-item-views.csv
+datasets/train-purchases.csv
+datasets/train-queries.csv
+datasets/diginetica/all_train_seq.txt
+datasets/diginetica/test.txt
+datasets/diginetica/train.txt
