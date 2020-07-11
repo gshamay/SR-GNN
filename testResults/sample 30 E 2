@@ -1,0 +1,371 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe "C:\Program Files\JetBrains\PyCharm Community Edition 2019.3.4\plugins\python-ce\helpers\pydev\pydevd.py" --multiproc --qt-support=auto --client 127.0.0.1 --port 53502 --file C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py --dataset sample
+pydev debugger: process 15776 is connecting
+
+Connected to pydev debugger (build 193.6911.25)
+Namespace(batchSize=100, dataset='sample', epoch=30, hiddenSize=100, l2=1e-05, lr=0.001, lr_dc=0.1, lr_dc_step=3, nonhybrid=False, patience=10, step=1, valid_portion=0.1, validation=False)
+-------------------------------------------------------
+epoch:  0
+start training:  2020-07-09 18:43:06.436211
+C:\pycharmEnv\pythin37x64Env\lib\site-packages\torch\optim\lr_scheduler.py:123: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate", UserWarning)
+[0/13] Loss: 5.7309
+[3/13] Loss: 5.7199
+[6/13] Loss: 5.7144
+[9/13] Loss: 5.7009
+[12/13] Loss: 5.6759
+	Loss:	74.192
+start predicting:  2020-07-09 18:43:07.620527
+Best Result:
+	Recall@20:	5.0505	MMR@20:	1.0993	Epoch:	0,	0
+-------------------------------------------------------
+epoch:  1
+start training:  2020-07-09 18:43:07.707477
+[0/13] Loss: 5.6172
+[3/13] Loss: 5.5903
+[6/13] Loss: 5.4843
+[9/13] Loss: 5.4087
+[12/13] Loss: 5.8258
+	Loss:	71.959
+start predicting:  2020-07-09 18:43:08.983743
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	1,	1
+-------------------------------------------------------
+epoch:  2
+start training:  2020-07-09 18:43:09.065695
+[0/13] Loss: 5.2383
+[3/13] Loss: 5.3615
+[6/13] Loss: 5.2575
+[9/13] Loss: 5.3902
+[12/13] Loss: 4.7518
+	Loss:	68.386
+start predicting:  2020-07-09 18:43:10.406924
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	2,	1
+-------------------------------------------------------
+epoch:  3
+start training:  2020-07-09 18:43:10.499870
+[0/13] Loss: 5.2476
+[3/13] Loss: 5.2662
+[6/13] Loss: 5.0807
+[9/13] Loss: 5.2532
+[12/13] Loss: 4.4653
+	Loss:	67.659
+start predicting:  2020-07-09 18:43:11.832103
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	3,	1
+-------------------------------------------------------
+epoch:  4
+start training:  2020-07-09 18:43:11.903063
+[0/13] Loss: 5.2448
+[3/13] Loss: 5.2559
+[6/13] Loss: 5.2185
+[9/13] Loss: 5.1679
+[12/13] Loss: 4.2889
+	Loss:	67.058
+start predicting:  2020-07-09 18:43:13.261281
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	4,	1
+-------------------------------------------------------
+epoch:  5
+start training:  2020-07-09 18:43:13.345233
+[0/13] Loss: 5.3078
+[3/13] Loss: 5.2633
+[6/13] Loss: 5.0441
+[9/13] Loss: 5.1941
+[12/13] Loss: 5.7861
+	Loss:	68.182
+start predicting:  2020-07-09 18:43:14.733434
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	5,	1
+-------------------------------------------------------
+epoch:  6
+start training:  2020-07-09 18:43:14.826381
+[0/13] Loss: 5.4591
+[3/13] Loss: 5.3214
+[6/13] Loss: 5.1599
+[9/13] Loss: 5.0129
+[12/13] Loss: 4.8857
+	Loss:	67.283
+start predicting:  2020-07-09 18:43:16.248562
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	6,	1
+-------------------------------------------------------
+epoch:  7
+start training:  2020-07-09 18:43:16.333513
+[0/13] Loss: 5.0823
+[3/13] Loss: 5.3817
+[6/13] Loss: 5.2203
+[9/13] Loss: 5.1845
+[12/13] Loss: 4.3325
+	Loss:	66.717
+start predicting:  2020-07-09 18:43:17.738704
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	7,	1
+-------------------------------------------------------
+epoch:  8
+start training:  2020-07-09 18:43:17.829652
+[0/13] Loss: 5.1097
+[3/13] Loss: 5.4498
+[6/13] Loss: 5.3013
+[9/13] Loss: 5.2067
+[12/13] Loss: 5.5867
+	Loss:	67.879
+start predicting:  2020-07-09 18:43:19.285814
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	8,	1
+-------------------------------------------------------
+epoch:  9
+start training:  2020-07-09 18:43:19.380759
+[0/13] Loss: 5.2109
+[3/13] Loss: 5.0675
+[6/13] Loss: 5.0451
+[9/13] Loss: 5.3204
+[12/13] Loss: 5.6979
+	Loss:	67.981
+start predicting:  2020-07-09 18:43:20.849914
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	9,	1
+-------------------------------------------------------
+epoch:  10
+start training:  2020-07-09 18:43:20.923871
+[0/13] Loss: 5.0695
+[3/13] Loss: 5.1521
+[6/13] Loss: 5.2890
+[9/13] Loss: 5.1534
+[12/13] Loss: 5.5694
+	Loss:	67.855
+start predicting:  2020-07-09 18:43:22.341056
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	10,	1
+-------------------------------------------------------
+epoch:  11
+start training:  2020-07-09 18:43:22.422009
+[0/13] Loss: 5.1394
+[3/13] Loss: 5.2658
+[6/13] Loss: 5.2694
+[9/13] Loss: 5.2927
+[12/13] Loss: 5.3741
+	Loss:	67.667
+start predicting:  2020-07-09 18:43:23.950129
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	11,	1
+-------------------------------------------------------
+epoch:  12
+start training:  2020-07-09 18:43:24.045075
+[0/13] Loss: 5.2291
+[3/13] Loss: 5.1906
+[6/13] Loss: 5.2148
+[9/13] Loss: 5.2647
+[12/13] Loss: 4.6110
+	Loss:	66.942
+start predicting:  2020-07-09 18:43:25.551208
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	12,	1
+-------------------------------------------------------
+epoch:  13
+start training:  2020-07-09 18:43:25.657147
+[0/13] Loss: 5.2602
+[3/13] Loss: 5.2345
+[6/13] Loss: 5.3176
+[9/13] Loss: 5.1280
+[12/13] Loss: 4.7555
+	Loss:	67.078
+start predicting:  2020-07-09 18:43:27.169277
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	13,	1
+-------------------------------------------------------
+epoch:  14
+start training:  2020-07-09 18:43:27.262223
+[0/13] Loss: 5.1945
+[3/13] Loss: 5.2897
+[6/13] Loss: 5.2846
+[9/13] Loss: 5.0665
+[12/13] Loss: 4.7129
+	Loss:	67.038
+start predicting:  2020-07-09 18:43:28.715387
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	14,	1
+-------------------------------------------------------
+epoch:  15
+start training:  2020-07-09 18:43:28.800338
+[0/13] Loss: 5.1051
+[3/13] Loss: 5.2990
+[6/13] Loss: 5.2132
+[9/13] Loss: 5.0825
+[12/13] Loss: 4.7820
+	Loss:	67.103
+start predicting:  2020-07-09 18:43:30.216523
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	15,	1
+-------------------------------------------------------
+epoch:  16
+start training:  2020-07-09 18:43:30.307471
+[0/13] Loss: 5.1425
+[3/13] Loss: 5.1849
+[6/13] Loss: 5.1451
+[9/13] Loss: 5.1865
+[12/13] Loss: 5.2874
+	Loss:	67.583
+start predicting:  2020-07-09 18:43:31.769629
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	16,	1
+-------------------------------------------------------
+epoch:  17
+start training:  2020-07-09 18:43:31.852582
+[0/13] Loss: 5.1520
+[3/13] Loss: 5.1958
+[6/13] Loss: 5.1638
+[9/13] Loss: 5.2076
+[12/13] Loss: 5.7485
+	Loss:	68.021
+start predicting:  2020-07-09 18:43:33.253775
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	17,	1
+-------------------------------------------------------
+epoch:  18
+start training:  2020-07-09 18:43:33.355720
+[0/13] Loss: 5.1342
+[3/13] Loss: 5.1722
+[6/13] Loss: 5.1590
+[9/13] Loss: 5.1175
+[12/13] Loss: 5.6506
+	Loss:	67.928
+start predicting:  2020-07-09 18:43:34.898828
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	18,	1
+-------------------------------------------------------
+epoch:  19
+start training:  2020-07-09 18:43:34.994773
+[0/13] Loss: 5.1220
+[3/13] Loss: 4.9806
+[6/13] Loss: 5.3288
+[9/13] Loss: 5.3217
+[12/13] Loss: 5.3081
+	Loss:	67.603
+start predicting:  2020-07-09 18:43:36.522894
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	19,	1
+-------------------------------------------------------
+epoch:  20
+start training:  2020-07-09 18:43:36.625834
+[0/13] Loss: 5.3436
+[3/13] Loss: 5.1407
+[6/13] Loss: 5.2031
+[9/13] Loss: 5.2099
+[12/13] Loss: 5.5090
+	Loss:	67.794
+start predicting:  2020-07-09 18:43:38.076999
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	20,	1
+-------------------------------------------------------
+epoch:  21
+start training:  2020-07-09 18:43:38.167947
+[0/13] Loss: 5.2623
+[3/13] Loss: 5.1323
+[6/13] Loss: 5.1000
+[9/13] Loss: 5.1087
+[12/13] Loss: 5.6738
+	Loss:	67.950
+start predicting:  2020-07-09 18:43:39.625108
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	21,	1
+-------------------------------------------------------
+epoch:  22
+start training:  2020-07-09 18:43:39.710060
+[0/13] Loss: 5.3128
+[3/13] Loss: 5.1688
+[6/13] Loss: 5.1707
+[9/13] Loss: 5.3422
+[12/13] Loss: 5.5853
+	Loss:	67.866
+start predicting:  2020-07-09 18:43:41.220190
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	22,	1
+-------------------------------------------------------
+epoch:  23
+start training:  2020-07-09 18:43:41.326129
+[0/13] Loss: 5.1959
+[3/13] Loss: 5.0118
+[6/13] Loss: 5.0957
+[9/13] Loss: 5.1494
+[12/13] Loss: 5.3559
+	Loss:	67.648
+start predicting:  2020-07-09 18:43:42.837260
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	23,	1
+-------------------------------------------------------
+epoch:  24
+start training:  2020-07-09 18:43:42.929208
+[0/13] Loss: 5.1289
+[3/13] Loss: 5.2402
+[6/13] Loss: 5.1038
+[9/13] Loss: 5.2827
+[12/13] Loss: 5.3809
+	Loss:	67.672
+start predicting:  2020-07-09 18:43:44.396364
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	24,	1
+-------------------------------------------------------
+epoch:  25
+start training:  2020-07-09 18:43:44.491308
+[0/13] Loss: 5.2221
+[3/13] Loss: 5.1991
+[6/13] Loss: 5.2576
+[9/13] Loss: 5.4233
+[12/13] Loss: 5.0957
+	Loss:	67.401
+start predicting:  2020-07-09 18:43:45.992445
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	25,	1
+-------------------------------------------------------
+epoch:  26
+start training:  2020-07-09 18:43:46.082392
+[0/13] Loss: 5.1986
+[3/13] Loss: 5.2584
+[6/13] Loss: 5.2613
+[9/13] Loss: 5.2893
+[12/13] Loss: 5.5315
+	Loss:	67.815
+start predicting:  2020-07-09 18:43:47.579530
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	26,	1
+-------------------------------------------------------
+epoch:  27
+start training:  2020-07-09 18:43:47.655491
+[0/13] Loss: 5.0814
+[3/13] Loss: 5.1476
+[6/13] Loss: 5.1805
+[9/13] Loss: 5.2490
+[12/13] Loss: 3.8925
+	Loss:	66.258
+start predicting:  2020-07-09 18:43:49.113007
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	27,	1
+-------------------------------------------------------
+epoch:  28
+start training:  2020-07-09 18:43:49.196958
+[0/13] Loss: 5.1725
+[3/13] Loss: 5.1136
+[6/13] Loss: 5.3440
+[9/13] Loss: 5.1482
+[12/13] Loss: 4.7454
+	Loss:	67.069
+start predicting:  2020-07-09 18:43:50.615142
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	28,	1
+-------------------------------------------------------
+epoch:  29
+start training:  2020-07-09 18:43:50.712087
+[0/13] Loss: 5.3242
+[3/13] Loss: 5.0316
+[6/13] Loss: 5.1844
+[9/13] Loss: 5.3256
+[12/13] Loss: 5.7010
+	Loss:	67.976
+start predicting:  2020-07-09 18:43:52.158254
+Best Result:
+	Recall@20:	8.0808	MMR@20:	2.0202	Epoch:	29,	1
+-------------------------------------------------------
+Run time: 45.823985 s
+
+Process finished with exit code -1

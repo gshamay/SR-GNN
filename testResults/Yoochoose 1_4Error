@@ -1,0 +1,14 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py --dataset yoochoose1_4 --epoch 2
+Namespace(batchSize=100, dataset='yoochoose1_4', epoch=2, hiddenSize=100, l2=1e-05, lr=0.001, lr_dc=0.1, lr_dc_step=3, nonhybrid=False, patience=10, step=1, valid_portion=0.1, validation=False)
+Traceback (most recent call last):
+  File "C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py", line 83, in <module>
+    main()
+  File "C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py", line 43, in main
+    train_data = Data(train_data, shuffle=True)
+  File "C:\Users\gshamay.DALET\PycharmProjects\RS\Project\SR-GNN\pytorch_code\utils.py", line 58, in __init__
+    self.inputs = np.asarray(inputs)
+  File "C:\pycharmEnv\pythin37x64Env\lib\site-packages\numpy\core\_asarray.py", line 85, in asarray
+    return array(a, dtype, copy=False, order=order)
+numpy.core._exceptions.MemoryError: Unable to allocate array with shape (5917745, 199) and data type int32
+
+Process finished with exit code 1

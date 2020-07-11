@@ -1,0 +1,35 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe "C:\Program Files\JetBrains\PyCharm Community Edition 2019.3.4\plugins\python-ce\helpers\pydev\pydevd.py" --multiproc --qt-support=auto --client 127.0.0.1 --port 50671 --file C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py --dataset diginetica --epoch 2
+pydev debugger: process 16068 is connecting
+
+Connected to pydev debugger (build 193.6911.25)
+Namespace(batchSize=100, dataset='diginetica', epoch=2, hiddenSize=100, l2=1e-05, lr=0.001, lr_dc=0.1, lr_dc_step=3, nonhybrid=False, patience=10, step=1, valid_portion=0.1, validation=False)
+-------------------------------------------------------
+epoch:  0
+start training:  2020-07-10 12:15:20.393589
+C:\pycharmEnv\pythin37x64Env\lib\site-packages\torch\optim\lr_scheduler.py:123: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate", UserWarning)
+[0/7195] Loss: 10.6644
+[1440/7195] Loss: 8.4510
+[2880/7195] Loss: 7.0647
+[4320/7195] Loss: 6.2644
+[5760/7195] Loss: 5.5272
+	Loss:	50351.391
+start predicting:  2020-07-10 13:24:33.609498
+Best Result:
+	Recall@20:	44.5430	MMR@20:	14.0578	Epoch:	0,	0
+-------------------------------------------------------
+epoch:  1
+start training:  2020-07-10 13:26:20.690873
+[0/7195] Loss: 5.2685
+[1440/7195] Loss: 5.0968
+[2880/7195] Loss: 4.9998
+[4320/7195] Loss: 5.0832
+[5760/7195] Loss: 5.4673
+	Loss:	38013.441
+start predicting:  2020-07-10 14:38:08.384763
+Best Result:
+	Recall@20:	47.5533	MMR@20:	15.5101	Epoch:	1,	1
+-------------------------------------------------------
+Run time: 8675.637226 s
+
+Process finished with exit code -1

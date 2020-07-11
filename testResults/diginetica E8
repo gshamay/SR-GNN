@@ -1,0 +1,104 @@
+C:\pycharmEnv\pythin37x64Env\Scripts\python.exe C:/Users/gshamay.DALET/PycharmProjects/RS/Project/SR-GNN/pytorch_code/main.py --dataset diginetica --epoch 8
+Namespace(batchSize=100, dataset='diginetica', epoch=8, hiddenSize=100, l2=1e-05, lr=0.001, lr_dc=0.1, lr_dc_step=3, nonhybrid=False, patience=10, step=1, valid_portion=0.1, validation=False)
+C:\pycharmEnv\pythin37x64Env\lib\site-packages\torch\optim\lr_scheduler.py:123: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate", UserWarning)
+-------------------------------------------------------
+epoch:  0
+start training:  2020-07-10 18:35:51.397770
+[0/7195] Loss: 10.6771
+[1440/7195] Loss: 8.8296
+[2880/7195] Loss: 6.8929
+[4320/7195] Loss: 6.2725
+[5760/7195] Loss: 6.0423
+	Loss:	51434.668
+start predicting:  2020-07-10 19:40:20.966809
+Best Result:
+	Recall@20:	43.8660	MMR@20:	13.9779	Epoch:	0,	0
+-------------------------------------------------------
+epoch:  1
+start training:  2020-07-10 19:41:50.699168
+[0/7195] Loss: 5.2639
+[1440/7195] Loss: 5.2738
+[2880/7195] Loss: 4.9855
+[4320/7195] Loss: 5.1032
+[5760/7195] Loss: 5.3548
+	Loss:	38381.652
+start predicting:  2020-07-10 20:48:51.048947
+Best Result:
+	Recall@20:	46.8599	MMR@20:	15.1222	Epoch:	1,	1
+-------------------------------------------------------
+epoch:  2
+start training:  2020-07-10 20:50:18.900388
+[0/7195] Loss: 4.3520
+[1440/7195] Loss: 4.4705
+[2880/7195] Loss: 4.3951
+[4320/7195] Loss: 3.9114
+[5760/7195] Loss: 4.3803
+	Loss:	32324.209
+start predicting:  2020-07-10 21:57:22.473793
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.7862	Epoch:	2,	2
+-------------------------------------------------------
+epoch:  3
+start training:  2020-07-10 21:58:52.327083
+[0/7195] Loss: 4.1384
+[1440/7195] Loss: 4.0534
+[2880/7195] Loss: 4.4125
+[4320/7195] Loss: 4.5714
+[5760/7195] Loss: 4.1076
+	Loss:	30911.754
+start predicting:  2020-07-10 23:05:59.042187
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.8825	Epoch:	2,	3
+-------------------------------------------------------
+epoch:  4
+start training:  2020-07-10 23:07:28.942469
+[0/7195] Loss: 4.1738
+[1440/7195] Loss: 4.2966
+[2880/7195] Loss: 4.1377
+[4320/7195] Loss: 3.8646
+[5760/7195] Loss: 4.5630
+	Loss:	30196.061
+start predicting:  2020-07-11 00:14:32.964114
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.8825	Epoch:	2,	3
+-------------------------------------------------------
+epoch:  5
+start training:  2020-07-11 00:16:01.392223
+[0/7195] Loss: 4.2308
+[1440/7195] Loss: 3.7990
+[2880/7195] Loss: 3.6867
+[4320/7195] Loss: 3.6676
+[5760/7195] Loss: 3.7684
+	Loss:	28822.672
+start predicting:  2020-07-11 01:23:09.884798
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.8825	Epoch:	2,	3
+-------------------------------------------------------
+epoch:  6
+start training:  2020-07-11 01:24:39.621657
+[0/7195] Loss: 4.1792
+[1440/7195] Loss: 3.7820
+[2880/7195] Loss: 4.0908
+[4320/7195] Loss: 3.8415
+[5760/7195] Loss: 3.9992
+	Loss:	28659.994
+start predicting:  2020-07-11 02:32:09.850229
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.8825	Epoch:	2,	3
+-------------------------------------------------------
+epoch:  7
+start training:  2020-07-11 02:33:40.577015
+[0/7195] Loss: 4.0419
+[1440/7195] Loss: 3.9541
+[2880/7195] Loss: 3.7768
+[4320/7195] Loss: 3.9518
+[5760/7195] Loss: 4.2406
+	Loss:	28545.297
+start predicting:  2020-07-11 03:41:11.436230
+Best Result:
+	Recall@20:	51.6892	MMR@20:	17.8825	Epoch:	2,	3
+-------------------------------------------------------
+Run time: 32809.565937 s
+
+Process finished with exit code 0
