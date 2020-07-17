@@ -12,6 +12,8 @@ from utils import build_graph, Data, split_validation
 import pickle
 import argparse
 import datetime
+from printDebug import *
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
@@ -40,28 +42,37 @@ else:
 train_data = Data(train_data, sub_graph=True, method=opt.method, shuffle=True)
 test_data = Data(test_data, sub_graph=True, method=opt.method, shuffle=False)
 model = GGNN(hidden_size=opt.hiddenSize, out_size=opt.hiddenSize, batch_size=opt.batchSize, n_node=n_node,
-                 lr=opt.lr, l2=opt.l2,  step=opt.step, decay=opt.lr_dc_step * len(train_data.inputs) / opt.batchSize, lr_dc=opt.lr_dc,
-                 nonhybrid=opt.nonhybrid)
-print(opt)
+             lr=opt.lr, l2=opt.l2, step=opt.step, decay=opt.lr_dc_step * len(train_data.inputs) / opt.batchSize,
+             lr_dc=opt.lr_dc,
+             nonhybrid=opt.nonhybrid)
+printDebug(str(opt))
 best_result = [0, 0]
 best_epoch = [0, 0]
+
+Start = datetime.datetime.now()
+startDateString = Start.strftime("%Y-%m-%d-%H-%M-%S")
+fileName = 'Main_TF_' + opt.dataset \
+           + '_' + startDateString \
+           + '_running'
+printDebug('-- Starting @' + startDateString)
+
 for epoch in range(opt.epoch):
-    print('epoch: ', epoch, '===========================================')
+    printDebug('epoch: ' + str(epoch) + '===========================================')
     slices = train_data.generate_batch(model.batch_size)
     fetches = [model.opt, model.loss_train, model.global_step]
-    print('start training: ', datetime.datetime.now())
+    printDebug('start training: ' + str(datetime.datetime.now()))
     loss_ = []
     for i, j in zip(slices, np.arange(len(slices))):
         adj_in, adj_out, alias, item, mask, targets = train_data.get_slice(i)
-        _, loss, _ = model.run(fetches, targets, item, adj_in, adj_out, alias,  mask)
+        _, loss, _ = model.run(fetches, targets, item, adj_in, adj_out, alias, mask)
         loss_.append(loss)
     loss = np.mean(loss_)
     slices = test_data.generate_batch(model.batch_size)
-    print('start predicting: ', datetime.datetime.now())
-    hit, mrr, test_loss_ = [], [],[]
+    printDebug('start predicting: ' + str(datetime.datetime.now()))
+    hit, mrr, test_loss_ = [], [], []
     for i, j in zip(slices, np.arange(len(slices))):
         adj_in, adj_out, alias, item, mask, targets = test_data.get_slice(i)
-        scores, test_loss = model.run([model.score_test, model.loss_test], targets, item, adj_in, adj_out, alias,  mask)
+        scores, test_loss = model.run([model.score_test, model.loss_test], targets, item, adj_in, adj_out, alias, mask)
         test_loss_.append(test_loss)
         index = np.argsort(scores, 1)[:, -20:]
         for score, target in zip(index, targets):
@@ -69,15 +80,33 @@ for epoch in range(opt.epoch):
             if len(np.where(score == target - 1)[0]) == 0:
                 mrr.append(0)
             else:
-                mrr.append(1 / (20-np.where(score == target - 1)[0][0]))
-    hit = np.mean(hit)*100
-    mrr = np.mean(mrr)*100
+                mrr.append(1 / (20 - np.where(score == target - 1)[0][0]))
+    hit = np.mean(hit) * 100
+    mrr = np.mean(mrr) * 100
     test_loss = np.mean(test_loss_)
     if hit >= best_result[0]:
         best_result[0] = hit
         best_epoch[0] = epoch
     if mrr >= best_result[1]:
         best_result[1] = mrr
-        best_epoch[1]=epoch
-    print('train_loss:\t%.4f\ttest_loss:\t%4f\tRecall@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d'%
-          (loss, test_loss, best_result[0], best_result[1], best_epoch[0], best_epoch[1]))
+        best_epoch[1] = epoch
+
+    printDebug('train_loss:\t%.4f\ttest_loss:\t%4f\tRecall@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d' % (
+        loss, test_loss, best_result[0], best_result[1], best_epoch[0], best_epoch[1]))
+    printToFile(fileName)
+
+End = datetime.datetime.now()
+endDateString = End.strftime("%Y-%m-%d-%H-%M-%S")
+printDebug('Done @' + endDateString + " took " + str(End - Start))
+printToFile(fileName)
+finalFileName = 'Main_TF_' + opt.dataset \
+                + '_train_loss_%.4f_' % loss \
+                + '_test_loss_%4f_' % test_loss \
+                + '_Recall20_%.4f_' % best_result[0] \
+                + '_MMR20_%.4f_' % best_result[1] \
+                + '_Epoch_%d_' % best_epoch[0] \
+                + '_bestEpoch_%d' % best_epoch[1] \
+                + '_' + startDateString
+
+time.sleep(1)
+renameToFinalLog(fileName, finalFileName)

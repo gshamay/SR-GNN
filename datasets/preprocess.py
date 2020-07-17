@@ -16,7 +16,7 @@ import os
 from enum import Enum
 from printDebug import *
 
-# todo: [GS] added heades in youchoose clicks - session_id,timestamp,item_id,ccategory
+# todo: [GS] added headers in youchoose clicks - session_id,timestamp,item_id,ccategory
 # todo: [GS] add here end of session nodes EOS
 # todo: should we look for the eos as a standard node ? change the validation to include last session, w/o the eos  ?
 # the only used info from the data is the session and item IDs and the time/date
@@ -77,7 +77,7 @@ with open(dataset, "r") as f:
     for data in reader:
         sessid = data[session_id]
         if curdate and not curid == sessid:
-            # sesssion switch detected
+            # session switch detected
             date = ''
             if opt.dataset == 'yoochoose':
                 date = time.mktime(time.strptime(curdate[:19], '%Y-%m-%dT%H:%M:%S'))
@@ -326,6 +326,6 @@ fileName = "preprocess_" + opt.dataset \
            + "_minItemUsage_" + str(minItemUsage) \
            + "_minSeqLen_" + str(minSeqLen) \
            + "_" + dateString
-printToFile("./../testResults/" + fileName + ".log")
+printToFile(fileName)
 
 # todo: not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids
