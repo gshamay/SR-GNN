@@ -32,3 +32,4 @@ datasets/train-queries.csv
 datasets/diginetica/all_train_seq.txt
 datasets/diginetica/test.txt
 datasets/diginetica/train.txt
+datasets/dataset-train-diginetica.zip

@@ -11,6 +11,8 @@ Time OF run
     ? Run yoochoose with TS vs pytorch - time f Run ; Problem - TF dees not run
     Consider less epoches then the default ; default --epoch 30
     get diginetica - prepare and run
+    use less Data
+    Run once on all data - all epoch
 
 Add improvement
     Done - in the data prep / where adding sub seq - Check where the tested node is selected -  data Preparation - or test
@@ -24,8 +26,15 @@ Add improvement
         check that we have the same error on test w/o last click ?
         test on all data, and add constant error for the last click when running w/o improvement ? (bcz it is always wrong / had no way 'to be correct' (mainly in online mode)
     Where to add the new items ?
-        in train only  ?
-        in test and train ?
+        Done - Both - in train only  ? in test and train ?
+    Done - Add parameter for min item usage and min seq
+
+
+Research
+    check how many real end items exits, and how many usages are there for each (histogram)
+    Add parameter for min num of itemd in seq (seq len --> accuracy)
+    Add parameter for min item usage ( min item usage --> accuracy)
+    num of epochs --> accuracy
 
 general dev
     Done - Add print to file

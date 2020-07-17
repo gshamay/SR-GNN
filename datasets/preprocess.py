@@ -14,18 +14,21 @@ import operator
 import datetime
 import os
 from enum import Enum
-
 from printDebug import *
 
 # todo: [GS] added heades in youchoose clicks - session_id,timestamp,item_id,ccategory
 # todo: [GS] add here end of session nodes EOS
 # todo: should we look for the eos as a standard node ? change the validation to include last session, w/o the eos  ?
+# the only used info from the data is the session and item IDs and the time/date
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
+parser.add_argument('--minItemUsage', default='5', help='min item usage to be added to the graph, default is 5')
+parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
+parser.add_argument('--EOS', default='false', help='true or false, default is false')
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
-session_id = 'session_id'
+session_id = 'session_id'  # those fields has a bit different names between the different DBs
 item_id = 'item_id'
 dataset = 'sample_train-item-views.csv'
 if opt.dataset == 'diginetica':
@@ -34,6 +37,26 @@ if opt.dataset == 'diginetica':
     item_id = 'itemId'
 elif opt.dataset == 'yoochoose':
     dataset = 'yoochoose-clicks.dat'
+
+minItemUsage = int(opt.minItemUsage)
+if minItemUsage <= 0:  # todo: Check if not nan
+    printDebug("bad minItemUsage value [" + opt.minItemUsage + "] setting to 5")
+    minItemUsage = 5
+printDebug("minItemUsage[" + str(minItemUsage) + "]")
+
+minSeqLen = int(opt.minSeqLen)
+if minSeqLen < 0:
+    printDebug("bad minSeqLen value [" + opt.minSeqLen + "] setting to 2")
+    minSeqLen = 2
+printDebug("minSeqLen[" + str(minSeqLen) + "]")
+
+bEOS = False
+if opt.EOS == 'true':
+    bEOS = True
+else:
+    bEOS = False
+
+printDebug("bEOS[" + str(bEOS) + "]")
 
 Start = datetime.datetime.now()
 dateString = Start.strftime("%Y-%m-%d-%H%M%S")
@@ -114,9 +137,9 @@ sorted_counts = sorted(iid_counts.items(), key=operator.itemgetter(1))  # todo: 
 length = len(sess_clicks)
 for s in list(sess_clicks):
     curseq = sess_clicks[s]
-    filseq = list(filter(lambda i: iid_counts[i] >= 5, curseq))
-    if len(filseq) < 2:  # todo: [GS] keep only ids that were clicked 5 times or more
-        # todo: [GS] filter out sessions that has less then 2 clics that appeard less then 5 times (session become len 1)
+    filseq = list(filter(lambda i: iid_counts[i] >= minItemUsage, curseq))
+    if len(filseq) < minSeqLen:  # todo: [GS] keep only ids that were clicked 5 times or more
+        # todo: [GS] filter out sessions that has less then minSeqLen (defaulte is) 2 clics that appeard less then minItemUsage(default is 5) times (session become len 1)
         del sess_clicks[s]
         del sess_date[s]
         filteredOutSeq += 1
@@ -139,7 +162,7 @@ for _, date in dates:
 # 7 days for test # take the last 1 day from yoochosse or teh last 7 days of other dbs, and use them as the test
 splitdate = 0
 if opt.dataset == 'yoochoose':
-    splitdate = maxdate - 86400 * 1  # the number of seconds for a day：86400 60*60*24
+    splitdate = maxdate - 86400 * 1  # the number of seconds for a day：86400 60sec*60Min*24hours
 else:
     splitdate = maxdate - 86400 * 7
 
@@ -177,7 +200,8 @@ def obtian_tra():
                 outseq += [item_ctr]
                 item_dict[i] = item_ctr  # add the new item id to the dic (origItemID --> new ID)
                 item_ctr += 1  # prepare the next new item id
-        if len(outseq) < 2:  # Doesn't occur
+        if len(outseq) < minSeqLen:  # Doesn't occur
+            printDebug("Error ! should not get here")
             continue  # doesn't suppose to get here - bcz we filtered out all short sessions before
         train_ids += [s]
         train_dates += [date]
@@ -200,7 +224,7 @@ def obtian_tes():
                 outseq += [item_dict[i]]
             # else:
             #     printDebug("item not in the train dictionary-->ignored [" + i + "]")
-        if len(outseq) < 2:
+        if len(outseq) < minSeqLen:
             continue  # we can get here, bcz we filtered out items that are not in the training
         test_ids += [s]
         test_dates += [date]
@@ -223,8 +247,8 @@ def process_seqs(iseqs, idates):
             labs += [tar]
             out_seqs += [seq[:-i]]
             out_dates += [date]
-            ids += [id]     # The same session ID can be added a few times - once for each sub seq
-                            #  But those are new Session IDS now
+            ids += [id]  # The same session ID can be added a few times - once for each sub seq
+            #  But those are new Session IDS now
     return out_seqs, out_dates, labs, ids
 
 
@@ -254,7 +278,7 @@ for seq in tes_seqs:
     all += len(seq)
     allTest += len(seq)
 
-printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  #todo: those values are BEFORE adding the sub Seqs
+printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  # todo: those values are BEFORE adding the sub Seqs
 printDebug('avg Test: ' + str(allTest / (len(tes_seqs) * 1.0)))
 printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0)))
 
@@ -263,7 +287,7 @@ if opt.dataset == 'diginetica':
         os.makedirs('diginetica')
     pickle.dump(tra, open('diginetica/train.txt', 'wb'))
     pickle.dump(tes, open('diginetica/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('diginetica/all_train_seq.txt', 'wb'))
+    pickle.dump(tra_seqs, open('diginetica/all_train_seq.txt', 'wb'))  # not in use
 elif opt.dataset == 'yoochoose':
     if not os.path.exists('yoochoose1_4'):
         os.makedirs('yoochoose1_4')
@@ -280,23 +304,28 @@ elif opt.dataset == 'yoochoose':
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
     pickle.dump(tra4, open('yoochoose1_4/train.txt', 'wb'))
-    pickle.dump(seq4, open('yoochoose1_4/all_train_seq.txt', 'wb'))
+    pickle.dump(seq4, open('yoochoose1_4/all_train_seq.txt', 'wb'))  # not in use
 
     pickle.dump(tra64, open('yoochoose1_64/train.txt', 'wb'))
-    pickle.dump(seq64, open('yoochoose1_64/all_train_seq.txt', 'wb'))
+    pickle.dump(seq64, open('yoochoose1_64/all_train_seq.txt', 'wb'))  # not in use
 
 else:
     if not os.path.exists('sample'):
         os.makedirs('sample')
     pickle.dump(tra, open('sample/train.txt', 'wb'))
     pickle.dump(tes, open('sample/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))
+    pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))  # not in use
     # todo: Why do we keep the tra_seqs? (the original seq before the sub seq)
     #  Not sure how they could be used. We can see that they are not in use by the main
 
 End = datetime.datetime.now()
 dateString = End.strftime("%Y-%m-%d-%H-%M-%S")
 printDebug('Done @' + dateString + " took " + str(End - Start))
-printToFile("./../testResults/preprocess_" + opt.dataset + dateString + ".log")
+fileName = "preprocess_" + opt.dataset \
+           + "_EOS_" + str(bEOS) \
+           + "_minItemUsage_" + str(minItemUsage) \
+           + "_minSeqLen_" + str(minSeqLen) \
+           + "_" + dateString
+printToFile("./../testResults/" + fileName + ".log")
 
 # todo: not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids
