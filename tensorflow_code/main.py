@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time : 2018/10/17 5:40
 # @Author : {ZM7}
+# @updated : Gil Shamay and Alex Danieli
 # @File : main.py
 # @Software: PyCharm
 
@@ -14,6 +15,10 @@ import argparse
 import datetime
 from printDebug import *
 import time
+import random
+
+random.seed(1)
+np.random.seed(1)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
@@ -106,6 +111,7 @@ finalFileName = 'Main_TF_' + opt.dataset \
                 + '_MMR20_%.4f_' % best_result[1] \
                 + '_Epoch_%d_' % best_epoch[0] \
                 + '_bestEpoch_%d' % best_epoch[1] \
+                + '_Es_' + opt.epoch \
                 + '_' + startDateString
 
 time.sleep(1)

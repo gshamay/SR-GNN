@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 Created on July, 2018
-
 @author: Tangrizzly
+@updated : Gil Shamay and Alex Danieli
 """
-
+import random
 import argparse
 import time
 import csv
@@ -15,6 +15,8 @@ import datetime
 import os
 from enum import Enum
 from printDebug import *
+
+random.seed(1)
 
 # todo: [GS] added headers in youchoose clicks - session_id,timestamp,item_id,ccategory
 # todo: [GS] add here end of session nodes EOS
