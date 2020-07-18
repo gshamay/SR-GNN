@@ -58,6 +58,7 @@ Start = datetime.datetime.now()
 startDateString = Start.strftime("%Y-%m-%d-%H-%M-%S")
 fileName = 'Main_TF_' + opt.dataset \
            + '_' + startDateString \
+           + '_Es_' + str(opt.epoch) \
            + '_running'
 printDebug('-- Starting @' + startDateString)
 
@@ -111,7 +112,7 @@ finalFileName = 'Main_TF_' + opt.dataset \
                 + '_MMR20_%.4f_' % best_result[1] \
                 + '_Epoch_%d_' % best_epoch[0] \
                 + '_bestEpoch_%d' % best_epoch[1] \
-                + '_Es_' + opt.epoch \
+                + '_Es_' + str(opt.epoch) \
                 + '_' + str(startDateString)
 
 time.sleep(1)
