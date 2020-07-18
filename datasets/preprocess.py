@@ -29,6 +29,10 @@ parser.add_argument('--minItemUsage', default='5', help='min item usage to be ad
 parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
 parser.add_argument('--EOS', default='0',
                     help='the rate of the EOS insertion ; 0 adds nothing 1 add EOS for every real end, default is 0')
+parser.add_argument('--EvalEOS', default='false',
+                    help='(true) if evaluation should be done on all items, including last'
+                         + 'or (false) if should be done on all, but the last item in teh seq, '
+                         + 'as in the original code; default is false')
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
@@ -62,11 +66,19 @@ else:
 
 printDebug("bEOS[" + str(fEOS) + "]")
 
+bEvalEOS = False
+if opt.EvalEOS == 'false':
+    bEvalEOS = False
+else:
+    bEvalEOS = True
+
+##############################################
 Start = datetime.datetime.now()
 dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
 
 fileName = "preprocess_" + opt.dataset \
            + "_EOS_" + str(fEOS) \
+           + "_EvalEOS_" + str(bEvalEOS) \
            + "_minItemUsage_" + str(minItemUsage) \
            + "_minSeqLen_" + str(minSeqLen) \
            + "_" + dateBeginString
@@ -136,7 +148,6 @@ for s in list(sess_clicks):
 
 # Count number of times each item appears
 iid_counts = {}  # item --> Count num of times that the item was used in all seq
-iid_EOS_counts = {}  # item --> Count num of times that the item was used in all seq
 filteredOutSeq = 0
 for s in sess_clicks:
     seq = sess_clicks[s]
@@ -158,60 +169,15 @@ for s in list(sess_clicks):
         filteredOutSeq += 1
     else:
         sess_clicks[s] = filseq
-        # count the number of times that item appear as teh item in teh seq
-        lastItemInSession = filseq[len(filseq) - 1]
-        if lastItemInSession in iid_EOS_counts:
-            iid_EOS_counts[lastItemInSession] += 1
-        else:
-            iid_EOS_counts[lastItemInSession] = 1
 
-printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
+printDebug("filtered out rare items and short sequences "
+           + "before[" + str(length) + "]"
            + "after[" + str(len(sess_clicks)) + "]"
            + "filteredOutSeq[" + str(filteredOutSeq) + "]"
-           + "EOS items after filter[" + str(len(iid_EOS_counts)) + "]"
-           )
-################################
-# find how often the same EOS item is used ; there may some that are 'natural' EOS (like checkout page)
-iid_EOS_counts_sorted = sorted(iid_EOS_counts.items(), key=lambda x: x[1], reverse=True)
-EOS_counts = []
-for x in iid_EOS_counts_sorted:
-    EOS_counts.append(x[1])
-
-numOfEOSToAdd = 0
-if fEOS > 0.0:
-    numOfEOSToAdd = int(fEOS * len(iid_EOS_counts))
-    if numOfEOSToAdd < 1:
-        numOfEOSToAdd = 1
-    minSeqLen = minSeqLen + 1  # we would like to keep  minSeqLen counting the original seq len
-
-printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
-           + "after[" + str(len(sess_clicks)) + "]"
-           + "filteredOutSeq[" + str(filteredOutSeq) + "]"
-           + "EOS items after filter[" + str(len(iid_EOS_counts)) + "]"
-           + "MaxEOSLinks[" + str(max(EOS_counts)) + "]"
-           + "minSeqLen[" + str(minSeqLen) + "]"
-           + "fEOS[" + str(fEOS) + "]"
-           + "numOfEOSToAdd[" + str(numOfEOSToAdd) + "]"
            )
 
-# add artificial EOS as negative items
-addedEOSs = {}
-if numOfEOSToAdd > 0:
-    for s in list(sess_clicks):
-        curseq = sess_clicks[s]
-        eosToAdd = -(random.randrange(1, numOfEOSToAdd))
-        curseq.append(eosToAdd)
-        if eosToAdd in addedEOSs:
-            addedEOSs[eosToAdd] += 1
-        else:
-            addedEOSs[eosToAdd] = 1
-
-plt.hist(EOS_counts, bins=max(EOS_counts))
-plt.yscale('log')
-plotToFile(fileName + "_FullHistogram")
-###############################################
-
-# Split out test set based on dates
+##############################################
+printDebug("Split out test set based on dates")
 dates = list(sess_date.items())
 maxdate = dates[0][1]
 
@@ -237,13 +203,14 @@ printDebug("train sessions[" + str(len(tra_sess)) + "]")  # 186670    # 7966257
 printDebug("test  sessions[" + str(len(tes_sess)) + "]")  # 15979     # 15324
 printDebug(str(tra_sess[:3]) + "the first 3 sessions that will be used for train - out of [" + str(len(tra_sess)) + "]")
 printDebug(str(tes_sess[:3]) + "the first 3 sessions that will be used for test - out of [" + str(len(tes_sess)) + "]")
-printDebug("-- Splitting train set and test set @ %ss" % datetime.datetime.now())
+printDebug("-- Splitting train set and test set @ %ss" % datetime.datetime.now())  # the Split us done by the session id
 
+##############################################
+# Convert training sessions to sequences and renumber items to start from 1
 # Choosing item count >=5 gives approximately the same number of items as reported in paper
 item_dict = {}
 
 
-# Convert training sessions to sequences and renumber items to start from 1
 def obtian_tra():
     train_ids = []  # the sessions/seq ids
     train_seqs = []  # the seqs after the convert
@@ -295,7 +262,76 @@ def obtian_tes():
 tra_ids, tra_dates, tra_seqs = obtian_tra()
 tes_ids, tes_dates, tes_seqs = obtian_tes()
 
+##############################################
+# find how often the same EOS item is used ; there may some that are 'natural' EOS (like checkout page)
+# this must be done on teh train only - we can't know in the test what is the EOS
+# however we should add the aEOSs (artificial EOSs) to the test
+# and this must be done before adding sub sequences
 
+iid_EOS_counts = {}  # item --> Count num of times that the item was used as EOS
+for curseq in tra_seqs:
+    # count the number of times that item appear as teh item in teh seq
+    lastItemInSession = curseq[len(curseq) - 1]
+    if lastItemInSession in iid_EOS_counts:
+        iid_EOS_counts[lastItemInSession] += 1
+    else:
+        iid_EOS_counts[lastItemInSession] = 1
+
+printDebug("EOS items in train[" + str(len(iid_EOS_counts)) + "]")
+
+iid_EOS_counts_sorted = sorted(iid_EOS_counts.items(), key=lambda x: x[1], reverse=True)
+EOS_counts = []
+for x in iid_EOS_counts_sorted:
+    EOS_counts.append(x[1])
+
+numOfEOSToAdd = 0
+if fEOS > 0.0:
+    numOfEOSToAdd = int(fEOS * len(iid_EOS_counts))
+    if numOfEOSToAdd < 1:
+        numOfEOSToAdd = 1
+
+printDebug("Sequences in train [" + str(len(tra_seqs)) + "]"
+           + "EOS items[" + str(len(iid_EOS_counts)) + "]"
+           + "MaxEOSLinks[" + str(max(EOS_counts)) + "]"
+           + "fEOS[" + str(fEOS) + "]"
+           + "numOfEOSToAdd[" + str(numOfEOSToAdd) + "]aEOSs"
+           )
+
+# add THE artificial EOS (as negative items) to the train
+addedEOSsOnTrain = {}  # keep statistics about the added aESOs
+addedEOSsOnTest = {}  # keep statistics about the added aESOs
+if numOfEOSToAdd > 0:
+    for curseq in tra_seqs:
+        eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+        curseq.append(eosToAdd)
+        if eosToAdd in addedEOSsOnTrain:
+            addedEOSsOnTrain[eosToAdd] += 1
+        else:
+            addedEOSsOnTrain[eosToAdd] = 1
+
+plt.hist(EOS_counts, bins=max(EOS_counts))
+plt.yscale('log')
+plotToFile(fileName + "_FullHistogram")
+
+# if we want to validate as in the original paper
+# (without taking in consideration prediction on the last items)
+# we should not add the aEOSs to the test
+# but of we want to check the results WITH the actual EOS items - we should add the aESOs
+# those are used only for evaluation... we add them before adding the sub sequences
+
+if bEvalEOS:
+    if numOfEOSToAdd > 0:
+        for curseq in tes_seqs:
+            eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+            curseq.append(eosToAdd)
+            if eosToAdd in addedEOSsOnTest:
+                addedEOSsOnTest[eosToAdd] += 1
+            else:
+                addedEOSsOnTest[eosToAdd] = 1
+
+
+##############################################
+# generate new Seq based on all sub seq of the given seq
 def process_seqs(iseqs, idates):
     out_seqs = []
     out_dates = []
@@ -312,7 +348,6 @@ def process_seqs(iseqs, idates):
     return out_seqs, out_dates, labs, ids
 
 
-# generate new Seq based on all sub seq of the given seq
 trainSeqNumBefore = (len(tra_seqs))
 testSeqNumBefore = (len(tes_seqs))
 tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
@@ -344,8 +379,8 @@ printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0
 
 pathExt = ""
 # when we add EOS items, we saved them as a new DB info, according to the rate of the added items
-if (numOfEOSToAdd > 0):
-    pathExt = "EOS_" + str(fEOS)
+if numOfEOSToAdd > 0:
+    pathExt = "EOS_" + str(fEOS) + "_EvalEOS_" + str(bEvalEOS)
 
 if opt.dataset == 'diginetica':
     if not os.path.exists('diginetica' + pathExt):
