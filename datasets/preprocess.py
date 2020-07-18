@@ -27,7 +27,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
 parser.add_argument('--minItemUsage', default='5', help='min item usage to be added to the graph, default is 5')
 parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
-parser.add_argument('--EOS', default='false', help='true or false, default is false')
+parser.add_argument('--EOS', default='0',
+                    help='the rate of the EOS insertion ; 0 adds nothing 1 add EOS for every real end, default is 0')
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
@@ -53,19 +54,19 @@ if minSeqLen < 0:
     minSeqLen = 2
 printDebug("minSeqLen[" + str(minSeqLen) + "]")
 
-bEOS = False
-if opt.EOS == 'true':
-    bEOS = True
+fEOS = 0.0
+if opt.EOS == '0':
+    fEOS = 0.0
 else:
-    bEOS = False
+    fEOS = float(opt.EOS)
 
-printDebug("bEOS[" + str(bEOS) + "]")
+printDebug("bEOS[" + str(fEOS) + "]")
 
 Start = datetime.datetime.now()
 dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
 
 fileName = "preprocess_" + opt.dataset \
-           + "_EOS_" + str(bEOS) \
+           + "_EOS_" + str(fEOS) \
            + "_minItemUsage_" + str(minItemUsage) \
            + "_minSeqLen_" + str(minSeqLen) \
            + "_" + dateBeginString
@@ -167,26 +168,48 @@ for s in list(sess_clicks):
 printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
            + "after[" + str(len(sess_clicks)) + "]"
            + "filteredOutSeq[" + str(filteredOutSeq) + "]"
-           + "EOS items after filter[" + str(len(iid_EOS_counts)) + " ]"
+           + "EOS items after filter[" + str(len(iid_EOS_counts)) + "]"
            )
-
+################################
 # find how often the same EOS item is used ; there may some that are 'natural' EOS (like checkout page)
 iid_EOS_counts_sorted = sorted(iid_EOS_counts.items(), key=lambda x: x[1], reverse=True)
 EOS_counts = []
 for x in iid_EOS_counts_sorted:
     EOS_counts.append(x[1])
 
+numOfEOSToAdd = 0
+if fEOS > 0.0:
+    numOfEOSToAdd = int(fEOS * len(iid_EOS_counts))
+    if numOfEOSToAdd < 1:
+        numOfEOSToAdd = 1
+    minSeqLen = minSeqLen + 1  # we would like to keep  minSeqLen counting the original seq len
+
 printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
            + "after[" + str(len(sess_clicks)) + "]"
            + "filteredOutSeq[" + str(filteredOutSeq) + "]"
-           + "EOS items after filter[" + str(len(iid_EOS_counts)) + " ]"
-           + "MaxEOS["+max(EOS_counts)+"]"
+           + "EOS items after filter[" + str(len(iid_EOS_counts)) + "]"
+           + "MaxEOSLinks[" + str(max(EOS_counts)) + "]"
+           + "minSeqLen[" + str(minSeqLen) + "]"
+           + "fEOS[" + str(fEOS) + "]"
+           + "numOfEOSToAdd[" + str(numOfEOSToAdd) + "]"
            )
 
+# add artificial EOS as negative items
+addedEOSs = {}
+if numOfEOSToAdd > 0:
+    for s in list(sess_clicks):
+        curseq = sess_clicks[s]
+        eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+        curseq.append(eosToAdd)
+        if eosToAdd in addedEOSs:
+            addedEOSs[eosToAdd] += 1
+        else:
+            addedEOSs[eosToAdd] = 1
 
 plt.hist(EOS_counts, bins=max(EOS_counts))
 plt.yscale('log')
 plotToFile(fileName + "_FullHistogram")
+###############################################
 
 # Split out test set based on dates
 dates = list(sess_date.items())
@@ -289,15 +312,15 @@ def process_seqs(iseqs, idates):
     return out_seqs, out_dates, labs, ids
 
 
-# generate new Seq based on all sub seq of the given seq --> todo: We can HERE our improvement
+# generate new Seq based on all sub seq of the given seq
 trainSeqNumBefore = (len(tra_seqs))
 testSeqNumBefore = (len(tes_seqs))
 tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
 te_seqs, te_dates, te_labs, te_ids = process_seqs(tes_seqs, tes_dates)
 tra = (tr_seqs, tr_labs)
 tes = (te_seqs, te_labs)
-printDebug("Train size : before addiongSubSeq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
-printDebug("Test  size : before addiongSubSeq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
+printDebug("Train size : before adding Sub Seq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
+printDebug("Test  size : before adding Sub Seq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
 
 printDebug("Examples:")
 printDebug(str(tr_seqs[:3]) + "," + str(tr_dates[:3]) + str(tr_labs[:3]))  # example for train
@@ -319,19 +342,24 @@ printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  # todo: those
 printDebug('avg Test: ' + str(allTest / (len(tes_seqs) * 1.0)))
 printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0)))
 
+pathExt = ""
+# when we add EOS items, we saved them as a new DB info, according to the rate of the added items
+if (numOfEOSToAdd > 0):
+    pathExt = "EOS_" + str(fEOS)
+
 if opt.dataset == 'diginetica':
-    if not os.path.exists('diginetica'):
-        os.makedirs('diginetica')
-    pickle.dump(tra, open('diginetica/train.txt', 'wb'))
-    pickle.dump(tes, open('diginetica/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('diginetica/all_train_seq.txt', 'wb'))  # not in use
+    if not os.path.exists('diginetica' + pathExt):
+        os.makedirs('diginetica' + pathExt)
+    pickle.dump(tra, open('diginetica' + pathExt + '/train.txt', 'wb'))
+    pickle.dump(tes, open('diginetica' + pathExt + '/test.txt', 'wb'))
+    pickle.dump(tra_seqs, open('diginetica' + pathExt + '/all_train_seq.txt', 'wb'))  # not in use
 elif opt.dataset == 'yoochoose':
-    if not os.path.exists('yoochoose1_4'):
-        os.makedirs('yoochoose1_4')
-    if not os.path.exists('yoochoose1_64'):
-        os.makedirs('yoochoose1_64')
-    pickle.dump(tes, open('yoochoose1_4/test.txt', 'wb'))
-    pickle.dump(tes, open('yoochoose1_64/test.txt', 'wb'))
+    if not os.path.exists('yoochoose1_4' + pathExt):
+        os.makedirs('yoochoose1_4' + pathExt)
+    if not os.path.exists('yoochoose1_64' + pathExt):
+        os.makedirs('yoochoose1_64' + pathExt)
+    pickle.dump(tes, open('yoochoose1_4' + pathExt + '/test.txt', 'wb'))
+    pickle.dump(tes, open('yoochoose1_64' + pathExt + '/test.txt', 'wb'))
 
     # use only the last 1/4 of yoochoose @ yoochoose1_4 and 1/64 in yoochoose1_64
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
@@ -340,18 +368,18 @@ elif opt.dataset == 'yoochoose':
     tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:]), (tr_seqs[-split64:], tr_labs[-split64:])
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
-    pickle.dump(tra4, open('yoochoose1_4/train.txt', 'wb'))
-    pickle.dump(seq4, open('yoochoose1_4/all_train_seq.txt', 'wb'))  # not in use
+    pickle.dump(tra4, open('yoochoose1_4' + pathExt + '/train.txt', 'wb'))
+    pickle.dump(seq4, open('yoochoose1_4' + pathExt + '/all_train_seq.txt', 'wb'))  # not in use
 
-    pickle.dump(tra64, open('yoochoose1_64/train.txt', 'wb'))
-    pickle.dump(seq64, open('yoochoose1_64/all_train_seq.txt', 'wb'))  # not in use
+    pickle.dump(tra64, open('yoochoose1_64' + pathExt + '/train.txt', 'wb'))
+    pickle.dump(seq64, open('yoochoose1_64' + pathExt + '/all_train_seq.txt', 'wb'))  # not in use
 
 else:
-    if not os.path.exists('sample'):
-        os.makedirs('sample')
-    pickle.dump(tra, open('sample/train.txt', 'wb'))
-    pickle.dump(tes, open('sample/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))  # not in use
+    if not os.path.exists('sample' + pathExt):
+        os.makedirs('sample' + pathExt)
+    pickle.dump(tra, open('sample' + pathExt + '/train.txt', 'wb'))
+    pickle.dump(tes, open('sample' + pathExt + '/test.txt', 'wb'))
+    pickle.dump(tra_seqs, open('sample' + pathExt + '/all_train_seq.txt', 'wb'))  # not in use
     # todo: Why do we keep the tra_seqs? (the original seq before the sub seq)
     #  Not sure how they could be used. We can see that they are not in use by the main
 
