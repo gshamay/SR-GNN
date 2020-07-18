@@ -21,7 +21,8 @@ random.seed(1)
 np.random.seed(1)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
+parser.add_argument('--dataset', default='sample',
+                    help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample/sampleEOS_0.2_EvalEOS_False')
 parser.add_argument('--method', type=str, default='ggnn', help='ggnn/gat/gcn')
 parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--epoch', type=int, default=30, help='number of epochs to train for')
@@ -36,14 +37,22 @@ parser.add_argument('--lr_dc_step', type=int, default=3, help='the number of ste
 opt = parser.parse_args()
 train_data = pickle.load(open('../datasets/' + opt.dataset + '/train.txt', 'rb'))
 test_data = pickle.load(open('../datasets/' + opt.dataset + '/test.txt', 'rb'))
+
 # all_train_seq = pickle.load(open('../datasets/' + opt.dataset + '/all_train_seq.txt', 'rb'))
-if opt.dataset == 'diginetica':
-    n_node = 43098
-elif opt.dataset == 'yoochoose1_64' or opt.dataset == 'yoochoose1_4':
-    n_node = 37484
-else:
-    n_node = 310
+# if opt.dataset.find('diginetica') >= 0:
+#     n_node = 43098  # todo: [GS] This is the num of items - it must be taken from the data and not be hardCoded
+# elif opt.dataset == 'yoochoose1_64' or opt.dataset == 'yoochoose1_4':
+#     n_node = 37484
+# else:
+#     n_node = 310
 # g = build_graph(all_train_seq)
+item_Ctr = train_data[2]  # if you fail here - make sure you re prepare your DB [ this was added later]
+n_node = item_Ctr
+
+listx = list(train_data)
+listx.pop(2)
+train_data = tuple(listx)
+
 train_data = Data(train_data, sub_graph=True, method=opt.method, shuffle=True)
 test_data = Data(test_data, sub_graph=True, method=opt.method, shuffle=False)
 model = GGNN(hidden_size=opt.hiddenSize, out_size=opt.hiddenSize, batch_size=opt.batchSize, n_node=n_node,

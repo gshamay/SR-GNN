@@ -235,7 +235,7 @@ def obtian_tra():
         train_seqs += [outseq]
     printDebug("number of items[" + str(item_ctr) + "]")  # 43098, 37484
     # todo: Add here num of Session End items
-    return train_ids, train_dates, train_seqs
+    return train_ids, train_dates, train_seqs, item_ctr
 
 
 # Convert test sessions to sequences, ignoring items that do not appear in training set
@@ -259,7 +259,7 @@ def obtian_tes():
     return test_ids, test_dates, test_seqs
 
 
-tra_ids, tra_dates, tra_seqs = obtian_tra()
+tra_ids, tra_dates, tra_seqs, items_ctr = obtian_tra()
 tes_ids, tes_dates, tes_seqs = obtian_tes()
 
 ##############################################
@@ -297,18 +297,27 @@ printDebug("Sequences in train [" + str(len(tra_seqs)) + "]"
            + "numOfEOSToAdd[" + str(numOfEOSToAdd) + "]aEOSs"
            )
 
-# add THE artificial EOS (as negative items) to the train
-addedEOSsOnTrain = {}  # keep statistics about the added aESOs
-addedEOSsOnTest = {}  # keep statistics about the added aESOs
+# add THE artificial EOS to the train - they can't be added as negative items (algorithm expect positive IDs)
+# --> use items_ctr as the ID generator
+addedEOSsOnTrain_IDs = {}  # keep the IDs of the aEOSs ; not all expected items may be added
+addedEOSsOnTrain = {}  # keep statistics about the added aESOs / train
+addedEOSsOnTest = {}  # keep statistics about the added aESOs / test
 if numOfEOSToAdd > 0:
     for curseq in tra_seqs:
         eosToAdd = -(random.randrange(1, numOfEOSToAdd))
-        curseq.append(eosToAdd)
         if eosToAdd in addedEOSsOnTrain:
             addedEOSsOnTrain[eosToAdd] += 1
         else:
             addedEOSsOnTrain[eosToAdd] = 1
+            addedEOSsOnTrain_IDs[eosToAdd] = items_ctr
+            items_ctr = items_ctr + 1
 
+        if eosToAdd in addedEOSsOnTrain_IDs:
+            curseq.append(addedEOSsOnTrain_IDs[eosToAdd])
+        else:
+            printDebug("ERROR! We must not get here (bad aEOS in train)")
+
+printDebug("items_ctr[" + str(items_ctr) + "]actual added aEOSs[" + str(len(addedEOSsOnTrain)) + "]")
 plt.hist(EOS_counts, bins=max(EOS_counts))
 plt.yscale('log')
 plotToFile(fileName + "_FullHistogram")
@@ -323,7 +332,10 @@ if bEvalEOS:
     if numOfEOSToAdd > 0:
         for curseq in tes_seqs:
             eosToAdd = -(random.randrange(1, numOfEOSToAdd))
-            curseq.append(eosToAdd)
+            if eosToAdd in addedEOSsOnTrain_IDs:
+                curseq.append(addedEOSsOnTrain_IDs[eosToAdd])
+            else:
+                printDebug("ERROR! We must not get here (bad aEOS in test)")
             if eosToAdd in addedEOSsOnTest:
                 addedEOSsOnTest[eosToAdd] += 1
             else:
@@ -352,7 +364,7 @@ trainSeqNumBefore = (len(tra_seqs))
 testSeqNumBefore = (len(tes_seqs))
 tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
 te_seqs, te_dates, te_labs, te_ids = process_seqs(tes_seqs, tes_dates)
-tra = (tr_seqs, tr_labs)
+tra = (tr_seqs, tr_labs, items_ctr)
 tes = (te_seqs, te_labs)
 printDebug("Train size : before adding Sub Seq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
 printDebug("Test  size : before adding Sub Seq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
