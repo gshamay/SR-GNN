@@ -2,6 +2,7 @@
 # Gil Shamay
 import datetime
 import os
+import matplotlib.pyplot as plt
 
 stringToPrintToFile = ""
 
@@ -16,8 +17,17 @@ def printDebug(str):
 
 destinationFolder = "./../testResults/"
 
+_FileName_ = ""
 
-def printToFile(fileName):
+
+def setFileName(fileName):
+    global _FileName_
+    _FileName_ = fileName
+
+
+def printToFile(fileName=""):
+    if (fileName == ""):
+        fileName = _FileName_
     fileName = fileNameToFullPath(fileName)
     global stringToPrintToFile
     file1 = open(fileName, "a")
@@ -27,10 +37,14 @@ def printToFile(fileName):
     file1.close()
 
 
-def fileNameToFullPath(fileName):
-    fileName = destinationFolder + fileName + ".log"
+def fileNameToFullPath(fileName, ext=".log"):
+    fileName = destinationFolder + fileName + ext
     return fileName
 
 
 def renameToFinalLog(src, trgt):
     os.rename(fileNameToFullPath(src), fileNameToFullPath(trgt))
+
+
+def plotToFile(fileName):
+    plt.savefig(fileNameToFullPath(fileName, '.png'))

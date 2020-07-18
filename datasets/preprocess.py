@@ -15,6 +15,7 @@ import datetime
 import os
 from enum import Enum
 from printDebug import *
+import matplotlib.pyplot as plt
 
 random.seed(1)
 
@@ -61,8 +62,16 @@ else:
 printDebug("bEOS[" + str(bEOS) + "]")
 
 Start = datetime.datetime.now()
-dateString = Start.strftime("%Y-%m-%d-%H%M%S")
-printDebug('-- Starting @' + dateString)
+dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
+
+fileName = "preprocess_" + opt.dataset \
+           + "_EOS_" + str(bEOS) \
+           + "_minItemUsage_" + str(minItemUsage) \
+           + "_minSeqLen_" + str(minSeqLen) \
+           + "_" + dateBeginString
+
+setFileName(fileName)
+printDebug('-- Starting @' + dateBeginString)
 
 with open(dataset, "r") as f:
     if opt.dataset == 'yoochoose':
@@ -126,6 +135,7 @@ for s in list(sess_clicks):
 
 # Count number of times each item appears
 iid_counts = {}  # item --> Count num of times that the item was used in all seq
+iid_EOS_counts = {}  # item --> Count num of times that the item was used in all seq
 filteredOutSeq = 0
 for s in sess_clicks:
     seq = sess_clicks[s]
@@ -147,11 +157,36 @@ for s in list(sess_clicks):
         filteredOutSeq += 1
     else:
         sess_clicks[s] = filseq
+        # count the number of times that item appear as teh item in teh seq
+        lastItemInSession = filseq[len(filseq) - 1]
+        if lastItemInSession in iid_EOS_counts:
+            iid_EOS_counts[lastItemInSession] += 1
+        else:
+            iid_EOS_counts[lastItemInSession] = 1
 
 printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
            + "after[" + str(len(sess_clicks)) + "]"
            + "filteredOutSeq[" + str(filteredOutSeq) + "]"
+           + "EOS items after filter[" + str(len(iid_EOS_counts)) + " ]"
            )
+
+# find how often the same EOS item is used ; there may some that are 'natural' EOS (like checkout page)
+iid_EOS_counts_sorted = sorted(iid_EOS_counts.items(), key=lambda x: x[1], reverse=True)
+EOS_counts = []
+for x in iid_EOS_counts_sorted:
+    EOS_counts.append(x[1])
+
+printDebug("Sequences before filtering out rare items and short sequences [" + str(length) + "]"
+           + "after[" + str(len(sess_clicks)) + "]"
+           + "filteredOutSeq[" + str(filteredOutSeq) + "]"
+           + "EOS items after filter[" + str(len(iid_EOS_counts)) + " ]"
+           + "MaxEOS["+max(EOS_counts)+"]"
+           )
+
+
+plt.hist(EOS_counts, bins=max(EOS_counts))
+plt.yscale('log')
+plotToFile(fileName + "_FullHistogram")
 
 # Split out test set based on dates
 dates = list(sess_date.items())
@@ -321,13 +356,8 @@ else:
     #  Not sure how they could be used. We can see that they are not in use by the main
 
 End = datetime.datetime.now()
-dateString = End.strftime("%Y-%m-%d-%H-%M-%S")
-printDebug('Done @' + dateString + " took " + str(End - Start))
-fileName = "preprocess_" + opt.dataset \
-           + "_EOS_" + str(bEOS) \
-           + "_minItemUsage_" + str(minItemUsage) \
-           + "_minSeqLen_" + str(minSeqLen) \
-           + "_" + dateString
-printToFile(fileName)
+dateEndString = End.strftime("%Y-%m-%d-%H-%M-%S")
+printDebug('Done @' + dateEndString + " took " + str(End - Start))
+printToFile()
 
 # todo: not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids

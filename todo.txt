@@ -24,6 +24,7 @@ Add improvement
     how o identify EOS items ?
         negative item ids ?
     how many EOS items to add
+        Done - Count the usage of the real EOSs
         add a few options and test Learn this
     how to compare results
         check that we have the same error on test w/o last click ?
@@ -32,7 +33,7 @@ Add improvement
         Done - Both - in train only  ? in test and train ?
     Done - Add parameter for min item usage and min seq
     Add the improvement --> Run a few times with ; run a few times without
-
+    Plot the distribution of the EOS
 
 Research
     check how many real end items exits, and how many usages are there for each (histogram)
