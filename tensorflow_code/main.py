@@ -112,7 +112,7 @@ finalFileName = 'Main_TF_' + opt.dataset \
                 + '_Epoch_%d_' % best_epoch[0] \
                 + '_bestEpoch_%d' % best_epoch[1] \
                 + '_Es_' + opt.epoch \
-                + '_' + startDateString
+                + '_' + str(startDateString)
 
 time.sleep(1)
 renameToFinalLog(fileName, finalFileName)
