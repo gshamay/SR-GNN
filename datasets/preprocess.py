@@ -412,7 +412,7 @@ elif opt.dataset == 'yoochoose':
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
     printDebug("1/4  db - train seq " + str(split4))
     printDebug("1/64 db - train seq " + str(split64))
-    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:]), (tr_seqs[-split64:], tr_labs[-split64:])
+    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:], items_ctr), (tr_seqs[-split64:], tr_labs[-split64:], items_ctr)
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
     pickle.dump(tra4, open('yoochoose1_4' + pathExt + '/train.txt', 'wb'))
