@@ -31,6 +31,7 @@ Add improvement
     Where to add the new items ?
         Done - Both - in train only  ? in test and train ?
     Done - Add parameter for min item usage and min seq
+    Add the improvement --> Run a few times with ; run a few times without
 
 
 Research
