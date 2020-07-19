@@ -42,7 +42,7 @@ test_data = pickle.load(open('../datasets/' + opt.dataset + '/test.txt', 'rb'))
 # if opt.dataset.find('diginetica') >= 0:
 #     n_node = 43098  # todo: [GS] This is the num of items - it must be taken from the data and not be hardCoded
 # elif opt.dataset == 'yoochoose1_64' or opt.dataset == 'yoochoose1_4':
-#     n_node = 37484
+#     n_node = 37484 # todo [GS] hpw dp we gace the same num of items in 4 and 64 (only the potential num is the same)
 # else:
 #     n_node = 310
 # g = build_graph(all_train_seq)
