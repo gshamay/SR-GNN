@@ -299,6 +299,7 @@ printDebug("Sequences in train [" + str(len(tra_seqs)) + "]"
 
 # add THE artificial EOS to the train - they can't be added as negative items (algorithm expect positive IDs)
 # --> use items_ctr as the ID generator
+items_ctr_beforeAddition = items_ctr
 addedEOSsOnTrain_IDs = {}  # keep the IDs of the aEOSs ; not all expected items may be added
 addedEOSsOnTrain = {}  # keep statistics about the added aESOs / train
 addedEOSsOnTest = {}  # keep statistics about the added aESOs / test
@@ -317,7 +318,10 @@ if numOfEOSToAdd > 0:
         else:
             printDebug("ERROR! We must not get here (bad aEOS in train)")
 
-printDebug("items_ctr[" + str(items_ctr) + "]actual added aEOSs[" + str(len(addedEOSsOnTrain)) + "]")
+printDebug("items_ctr[" + str(items_ctr)
+           + "]actual added aEOSs[" + str(len(addedEOSsOnTrain))
+           + "]items_ctr_beforeAddition[" + str(items_ctr_beforeAddition)
+           + "]")
 plt.hist(EOS_counts, bins=max(EOS_counts))
 plt.yscale('log')
 plotToFile(fileName + "_FullHistogram")
@@ -364,7 +368,7 @@ trainSeqNumBefore = (len(tra_seqs))
 testSeqNumBefore = (len(tes_seqs))
 tr_seqs, tr_dates, tr_labs, tr_ids = process_seqs(tra_seqs, tra_dates)
 te_seqs, te_dates, te_labs, te_ids = process_seqs(tes_seqs, tes_dates)
-tra = (tr_seqs, tr_labs, items_ctr)
+tra = (tr_seqs, tr_labs, items_ctr, items_ctr_beforeAddition)
 tes = (te_seqs, te_labs)
 printDebug("Train size : before adding Sub Seq[" + str(trainSeqNumBefore) + "]after[" + str(len(tr_seqs)) + "]")
 printDebug("Test  size : before adding Sub Seq[" + str(testSeqNumBefore) + "]after[" + str(len(te_seqs)) + "]")
@@ -412,7 +416,7 @@ elif opt.dataset == 'yoochoose':
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
     printDebug("1/4  db - train seq " + str(split4))
     printDebug("1/64 db - train seq " + str(split64))
-    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:], items_ctr), (tr_seqs[-split64:], tr_labs[-split64:], items_ctr)
+    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:], items_ctr, items_ctr_beforeAddition), (tr_seqs[-split64:], tr_labs[-split64:], items_ctr, items_ctr_beforeAddition)
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
     pickle.dump(tra4, open('yoochoose1_4' + pathExt + '/train.txt', 'wb'))
