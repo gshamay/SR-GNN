@@ -9,41 +9,52 @@ get more info
     check other papers evaluations - do they add info about how they generate seq data, how they test and evaluate ?
 
 Time OF run
-    Check with Bracha = possibility to get a machine with GPU/ how to run with GPU ?
-    Tool long even on yoochoose 1/64
+    Check with Bracha
+        The diff between res and paper res
+        the 'fine' we 'pay' for the aEOSs on standard evaluation
+        how to compare exactly results with EOS test
+        how to calculate MPR and Precision top 20 when a there can be multiple EOSs results
+        the fact that we don't run yoochoose 1/4
+            possibility to get a machine with GPU/ how to run with GPU ?
+
+    Done - 15 min  per epoch - Tool long even on yoochoose 1/64
     ? Run yoochoose with TS vs pytorch - time f Run ; Problem - TF dees not run
-    Consider less epoches then the default ; default --epoch 30
-    get diginetica - prepare and run
+    Done - run on 15 Consider less epoches then the default ; default --epoch 30
+    Done - get diginetica - prepare and run
     use less Data
     Run once on all data - all epoch
+    Enable Cuda
 
 Add improvement
     Done - in the data prep / where adding sub seq - Check where the tested node is selected -  data Preparation - or test
-    add the nodes in the train
-    add an option to OK EOS node in the validation
-    how o identify EOS items ?
-        negative item ids ?
+    Done - add the nodes in the train
+    Done - add an option to OK EOS node in the validation
+    Done - how o identify EOS items ?
+        No - Can't use negative; use id> item_ctr ; negative item ids ?
     how many EOS items to add
         Done - Count the usage of the real EOSs
         add a few options and test Learn this
     how to compare results
-        check that we have the same error on test w/o last click ?
+        Done - check that we have the same error on test w/o last click ?
         test on all data, and add constant error for the last click when running w/o improvement ? (bcz it is always wrong / had no way 'to be correct' (mainly in online mode)
     Where to add the new items ?
         Done - Both - in train only  ? in test and train ?
     Done - Add parameter for min item usage and min seq
-    Add the improvement --> Run a few times with ; run a few times without
-    Plot the distribution of the EOS
+    Done - Add the improvement --> Run a few times with ; run a few times without
+    Done ~ Plot the distribution of the EOS
+    loop on the % of aEOSs added
 
 Research
-    check how many real end items exits, and how many usages are there for each (histogram)
-    Add parameter for min num of itemd in seq (seq len --> accuracy)
-    Add parameter for min item usage ( min item usage --> accuracy)
+    Done - check how many real end items exits, and how many usages are there for each (histogram)
+    Done - Add parameter for min num of itemd in seq (seq len --> accuracy)
+    Done - Add parameter for min item usage ( min item usage --> accuracy)
     num of epochs --> accuracy
+    Loop on num of items in Seq
+    Loop of min item usage
 
 general dev
     Done - Add print to file
-    make TF run
+    Done - make TF run
 
 to understand
     What is the loss vs the recall and the mmr
