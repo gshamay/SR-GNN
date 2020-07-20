@@ -64,7 +64,7 @@ if opt.EOS == '0':
 else:
     fEOS = float(opt.EOS)
 
-printDebug("bEOS[" + str(fEOS) + "]")
+printDebug("fEOS[" + str(fEOS) + "]")
 
 bEvalEOS = False
 if opt.EvalEOS == 'false':
@@ -72,6 +72,7 @@ if opt.EvalEOS == 'false':
 else:
     bEvalEOS = True
 
+printDebug("bEvalEOS[" + str(bEvalEOS) + "]")
 ##############################################
 Start = datetime.datetime.now()
 dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
