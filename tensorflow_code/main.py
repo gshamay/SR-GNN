@@ -38,6 +38,7 @@ opt = parser.parse_args()
 train_data = pickle.load(open('../datasets/' + opt.dataset + '/train.txt', 'rb'))
 test_data = pickle.load(open('../datasets/' + opt.dataset + '/test.txt', 'rb'))
 
+printDebug("opt.dataset[" + opt.dataset + "]")
 # all_train_seq = pickle.load(open('../datasets/' + opt.dataset + '/all_train_seq.txt', 'rb'))
 # if opt.dataset.find('diginetica') >= 0:
 #     n_node = 43098  # todo: [GS] This is the num of items - it must be taken from the data and not be hardCoded
