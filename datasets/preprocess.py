@@ -31,8 +31,12 @@ parser.add_argument('--EOS', default='0',
                     help='the rate of the EOS insertion ; 0 adds nothing 1 add EOS for every real end, default is 0')
 parser.add_argument('--EvalEOS', default='false',
                     help='(true) if evaluation should be done on all items, including last'
-                         + 'or (false) if should be done on all, but the last item in teh seq, '
+                         + 'or (false) if should be done on all, except the last item in the seq, '
                          + 'as in the original code; default is false')
+parser.add_argument('--EvalEOSTestOnly', default='false',
+                    help='(true) if evaluation should be done on all items, including last on the test only'
+                         + 'or (false) if should be done on all, except the last item in the seq, '
+                         + 'This is to check the original code running on ALL data')
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
@@ -73,6 +77,14 @@ else:
     bEvalEOS = True
 
 printDebug("bEvalEOS[" + str(bEvalEOS) + "]")
+
+bEvalEOSTestOnly = False
+if opt.EvalEOSTestOnly == 'false':
+    bEvalEOSTestOnly = False
+else:
+    bEvalEOSTestOnly = True
+
+printDebug("bEvalEOSTestOnly[" + str(bEvalEOSTestOnly) + "]")
 ##############################################
 Start = datetime.datetime.now()
 dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
@@ -80,6 +92,7 @@ dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
 fileName = "preprocess_" + opt.dataset \
            + "_EOS_" + str(fEOS) \
            + "_EvalEOS_" + str(bEvalEOS) \
+           + "_bEvalEOSTestOnly_" + str(bEvalEOSTestOnly) \
            + "_minItemUsage_" + str(minItemUsage) \
            + "_minSeqLen_" + str(minSeqLen) \
            + "_" + dateBeginString
@@ -290,6 +303,8 @@ if fEOS > 0.0:
     numOfEOSToAdd = int(fEOS * len(iid_EOS_counts))
     if numOfEOSToAdd < 1:
         numOfEOSToAdd = 1
+    if bEvalEOSTestOnly:
+        numOfEOSToAdd = 1
 
 printDebug("Sequences in train [" + str(len(tra_seqs)) + "]"
            + "EOS items[" + str(len(iid_EOS_counts)) + "]"
@@ -304,25 +319,24 @@ items_ctr_beforeAddition = items_ctr
 addedEOSsOnTrain_IDs = {}  # keep the IDs of the aEOSs ; not all expected items may be added
 addedEOSsOnTrain = {}  # keep statistics about the added aESOs / train
 addedEOSsOnTest = {}  # keep statistics about the added aESOs / test
-if numOfEOSToAdd > 0:
-    for curseq in tra_seqs:
-        eosToAdd = -(random.randrange(1, numOfEOSToAdd))
-        if eosToAdd in addedEOSsOnTrain:
-            addedEOSsOnTrain[eosToAdd] += 1
-        else:
-            addedEOSsOnTrain[eosToAdd] = 1
-            addedEOSsOnTrain_IDs[eosToAdd] = items_ctr
-            items_ctr = items_ctr + 1
 
-        if eosToAdd in addedEOSsOnTrain_IDs:
-            curseq.append(addedEOSsOnTrain_IDs[eosToAdd])
-        else:
-            printDebug("ERROR! We must not get here (bad aEOS in train)")
+# update train with aEOSs
+if not bEvalEOSTestOnly:
+    if numOfEOSToAdd > 0:
+        for curseq in tra_seqs:
+            eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+            if eosToAdd in addedEOSsOnTrain:
+                addedEOSsOnTrain[eosToAdd] += 1
+            else:
+                addedEOSsOnTrain[eosToAdd] = 1
+                addedEOSsOnTrain_IDs[eosToAdd] = items_ctr
+                items_ctr = items_ctr + 1
 
-printDebug("items_ctr[" + str(items_ctr)
-           + "]actual added aEOSs[" + str(len(addedEOSsOnTrain))
-           + "]items_ctr_beforeAddition[" + str(items_ctr_beforeAddition)
-           + "]")
+            if eosToAdd in addedEOSsOnTrain_IDs:
+                curseq.append(addedEOSsOnTrain_IDs[eosToAdd])
+            else:
+                printDebug("ERROR! We must not get here (bad aEOS in train)")
+
 plt.hist(EOS_counts, bins=max(EOS_counts))
 plt.yscale('log')
 plotToFile(fileName + "_FullHistogram")
@@ -333,18 +347,41 @@ plotToFile(fileName + "_FullHistogram")
 # but of we want to check the results WITH the actual EOS items - we should add the aESOs
 # those are used only for evaluation... we add them before adding the sub sequences
 
+# update Test with aEOSs
+
+bAddedASingleAEOSForAll = False
 if bEvalEOS:
     if numOfEOSToAdd > 0:
         for curseq in tes_seqs:
-            eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+            if numOfEOSToAdd == 1:
+                eosToAdd = -1
+            else:
+                eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+
             if eosToAdd in addedEOSsOnTrain_IDs:
                 curseq.append(addedEOSsOnTrain_IDs[eosToAdd])
             else:
-                printDebug("ERROR! We must not get here (bad aEOS in test)")
+                if bEvalEOSTestOnly:
+                    # we didn't add any aEOS on train - only in test - we will add a single one for all -
+                    # it's not used for training at all
+                    curseq.append(items_ctr)
+                    bAddedASingleAEOSForAll = True
+                    addedEOSsOnTest[eosToAdd] = 1
+                else:
+                    printDebug("ERROR! We must not get here (bad aEOS in test)")
             if eosToAdd in addedEOSsOnTest:
                 addedEOSsOnTest[eosToAdd] += 1
             else:
                 addedEOSsOnTest[eosToAdd] = 1
+
+if bAddedASingleAEOSForAll:
+    items_ctr = items_ctr + 1
+
+printDebug("items_ctr[" + str(items_ctr)
+           + "]actual added aEOSs on train[" + str(len(addedEOSsOnTrain))
+           + "]actual added aEOSs on Test[" + str(len(addedEOSsOnTest))
+           + "]items_ctr_beforeAddition[" + str(items_ctr_beforeAddition)
+           + "]")
 
 
 ##############################################
@@ -397,7 +434,9 @@ printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0
 pathExt = ""
 # when we add EOS items, we saved them as a new DB info, according to the rate of the added items
 if numOfEOSToAdd > 0:
-    pathExt = "EOS_" + str(fEOS) + "_EvalEOS_" + str(bEvalEOS)
+    pathExt = "EOS_" + str(fEOS) \
+              + "_EvalEOS_" + str(bEvalEOS) \
+              + "_bEvalEOSTestOnly_" + str(bEvalEOSTestOnly)
 
 if opt.dataset == 'diginetica':
     if not os.path.exists('diginetica' + pathExt):
@@ -417,7 +456,8 @@ elif opt.dataset == 'yoochoose':
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
     printDebug("1/4  db - train seq " + str(split4))
     printDebug("1/64 db - train seq " + str(split64))
-    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:], items_ctr, items_ctr_beforeAddition), (tr_seqs[-split64:], tr_labs[-split64:], items_ctr, items_ctr_beforeAddition)
+    tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:], items_ctr, items_ctr_beforeAddition), (
+        tr_seqs[-split64:], tr_labs[-split64:], items_ctr, items_ctr_beforeAddition)
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
     pickle.dump(tra4, open('yoochoose1_4' + pathExt + '/train.txt', 'wb'))
