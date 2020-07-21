@@ -166,7 +166,7 @@ for epoch in range(opt.epoch):
         best_result[1] = mrr
         best_epoch[1] = epoch
 
-    printDebug('train_loss:\t%.4f\ttest_loss:\t%4f\tRecall@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d' % (
+    printDebug('train_loss:\t%.4f\ttest_loss:\t%4f\tPrecision@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d' % (
         loss, test_loss, best_result[0], best_result[1], best_epoch[0], best_epoch[1]))
     printDebug('actualEOSs:\t%d\tpredictedEOSs:\t%d\tfalsePositiveEOSs:\t%d\tfalseNegativeEOSs\t%d' % (
         actualEOSs, predictedEOSs, falsePositiveEOSs, falseNegativeEOSs))
@@ -180,7 +180,7 @@ printToFile(fileName)
 finalFileName = 'Main_TF_' + opt.dataset \
                 + '_train_loss_%.4f_' % loss \
                 + '_test_loss_%4f_' % test_loss \
-                + '_Recall20_%.4f_' % best_result[0] \
+                + '_Precision20_%.4f_' % best_result[0] \
                 + '_MMR20_%.4f_' % best_result[1] \
                 + '_Epoch_%d_' % best_epoch[0] \
                 + '_bestEpoch_%d' % best_epoch[1] \
