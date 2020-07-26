@@ -73,7 +73,6 @@ else:
 
 printDebug("fEOS[" + str(fEOS) + "]")
 
-
 iEOSNum = 0
 if opt.EOSNum == '0':
     iEOSNum = 0
@@ -81,7 +80,6 @@ else:
     iEOSNum = int(opt.EOSNum)
 
 printDebug("iEOSNum[" + str(iEOSNum) + "]")
-
 
 bEvalEOS = False
 if opt.EvalEOS == 'false':
@@ -342,7 +340,11 @@ addedEOSsOnTest = {}  # keep statistics about the added aESOs / test
 if not bEvalEOSTestOnly:
     if numOfEOSToAdd > 0:
         for curseq in tra_seqs:
-            eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+            if numOfEOSToAdd == 1:
+                eosToAdd = -1
+            else:
+                eosToAdd = -(random.randrange(1, numOfEOSToAdd))
+
             if eosToAdd in addedEOSsOnTrain:
                 addedEOSsOnTrain[eosToAdd] += 1
             else:
