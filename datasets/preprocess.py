@@ -29,6 +29,9 @@ parser.add_argument('--minItemUsage', default='5', help='min item usage to be ad
 parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
 parser.add_argument('--EOS', default='0',
                     help='the rate of the EOS insertion ; 0 adds nothing 1 add EOS for every real end, default is 0')
+parser.add_argument('--EOSNum', default='0',
+                    help='the actual number of aEOSs that will be added; 0 adds nothing ; '
+                         + 'this value overide the EOS ; default is 0')
 parser.add_argument('--EvalEOS', default='false',
                     help='(true) if evaluation should be done on all items, including last'
                          + 'or (false) if should be done on all, except the last item in the seq, '
@@ -70,6 +73,16 @@ else:
 
 printDebug("fEOS[" + str(fEOS) + "]")
 
+
+iEOSNum = 0
+if opt.EOSNum == '0':
+    iEOSNum = 0
+else:
+    iEOSNum = int(opt.EOSNum)
+
+printDebug("iEOSNum[" + str(iEOSNum) + "]")
+
+
 bEvalEOS = False
 if opt.EvalEOS == 'false':
     bEvalEOS = False
@@ -91,6 +104,7 @@ dateBeginString = Start.strftime("%Y-%m-%d-%H%M%S")
 
 fileName = "preprocess_" + opt.dataset \
            + "_EOS_" + str(fEOS) \
+           + "_EOSNum_" + str(iEOSNum) \
            + "_EvalEOS_" + str(bEvalEOS) \
            + "_bEvalEOSTestOnly_" + str(bEvalEOSTestOnly) \
            + "_minItemUsage_" + str(minItemUsage) \
@@ -306,10 +320,14 @@ if fEOS > 0.0:
     if bEvalEOSTestOnly:
         numOfEOSToAdd = 1
 
+if iEOSNum > 0:
+    numOfEOSToAdd = iEOSNum
+
 printDebug("Sequences in train [" + str(len(tra_seqs)) + "]"
            + "EOS items[" + str(len(iid_EOS_counts)) + "]"
            + "MaxEOSLinks[" + str(max(EOS_counts)) + "]"
            + "fEOS[" + str(fEOS) + "]"
+           + "iEOSNum[" + str(iEOSNum) + "]"
            + "numOfEOSToAdd[" + str(numOfEOSToAdd) + "]aEOSs"
            )
 
@@ -435,6 +453,7 @@ pathExt = ""
 # when we add EOS items, we saved them as a new DB info, according to the rate of the added items
 if numOfEOSToAdd > 0:
     pathExt = "EOS_" + str(fEOS) \
+              + "_EOSNum_" + str(iEOSNum) \
               + "_EvalEOS_" + str(bEvalEOS) \
               + "_bEvalEOSTestOnly_" + str(bEvalEOSTestOnly)
 
