@@ -1,5 +1,6 @@
 # Alex Danieli
 # Gil Shamay
+#this is a helper code
 import datetime
 import os
 import matplotlib.pyplot as plt

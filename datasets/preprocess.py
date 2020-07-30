@@ -31,31 +31,31 @@ parser.add_argument('--dataset', default='sample', help='dataset name: diginetic
 parser.add_argument('--minItemUsage', default='5', help='min item usage to be added to the graph, default is 5')
 parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
 
-# if this value is set the aEOS are added to the TRAIN data
 parser.add_argument('--EOS', default='0',
                     help='the rate of the EOS insertion, '
                          + '0 adds nothing '
                          + '1 add EOS for every real end, '
-                         + 'default is 0')
+                         + 'default is 0. '
+                         + 'if this value is set the aEOS are added to the TRAIN data')
 
-# if this value is set the aEOS are added to the TRAIN data
 parser.add_argument('--EOSNum', default='0',
                     help='the actual number of aEOSs that will be added, '
-                         + '0 adds nothing ; '
+                         + '0 adds nothing ; any float is accepted [0,1]'
                          + 'this value overide the EOS ; '
-                         + 'default is 0')
+                         + 'default is 0. '
+                         + 'if this value is set the aEOS are added to the TRAIN data')
 
-# if this value is set the aEOS are added to the TEST data
 parser.add_argument('--EvalEOS', default='false',
-                    help='(true) if evaluation should be done on all items, including last'
+                    help='(true) if evaluation should be done on all items, including last items'
                          + 'or (false) if should be done on all, except the last item in the seq, '
-                         + 'as in the original code; default is false')
+                         + 'as in the original code; default is false. '
+                         + 'if this value is set the aEOS are added to the TEST data')
 
-# if this value is set the aEOS are added ONLY to the TEST data
 parser.add_argument('--EvalEOSTestOnly', default='false',
-                    help='(true) if evaluation should be done on all items, including last on the test only'
+                    help='(true) if ONLY THE EVALUATION should be done on all items, including last itemd'
                          + 'or (false) if should be done as defined by the above parameters '
-                         + 'This is to check the original code running on ALL data')
+                         + 'This is to check the original code running on ALL data. '
+                         + 'if this value is set the aEOS are added ONLY to the TEST data')
 
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
