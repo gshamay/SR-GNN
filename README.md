@@ -4,9 +4,15 @@
 
 This is the code was originally developed for the AAAI 2019 Paper: [Session-based Recommendation with Graph Neural Networks](https://arxiv.org/abs/1811.00855). 
 
-It was updated by Gil Shamay(gshamay@gmail.com) and Alex Danieli (alex.daniels85@gmail.com)
+It was updated by:
 
-RecSys course project, Spring 2020, Ben Gurion University of the Negev, Israel
+Gil Shamay(gshamay@gmail.com) and Alex Danieli (alex.daniels85@gmail.com)
+
+RecSys course project, Spring 2020, 
+
+Department of Information Systems Engineering
+
+Ben-Gurion University, Beer-Sheva, Israel
 
 The original code is located @ https://github.com/CRIPAC-DIG/SR-GNN
 
