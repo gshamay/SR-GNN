@@ -39,14 +39,6 @@ train_data = pickle.load(open('../datasets/' + opt.dataset + '/train.txt', 'rb')
 test_data = pickle.load(open('../datasets/' + opt.dataset + '/test.txt', 'rb'))
 
 printDebug("opt.dataset[" + opt.dataset + "]")
-# all_train_seq = pickle.load(open('../datasets/' + opt.dataset + '/all_train_seq.txt', 'rb'))
-# if opt.dataset.find('diginetica') >= 0:
-#     n_node = 43098  # todo: [GS] This is the num of items - it must be taken from the data and not be hardCoded
-# elif opt.dataset == 'yoochoose1_64' or opt.dataset == 'yoochoose1_4':
-#     n_node = 37484 # todo [GS] hpw dp we gace the same num of items in 4 and 64 (only the potential num is the same)
-# else:
-#     n_node = 310
-# g = build_graph(all_train_seq)
 item_Ctr = train_data[2]  # if you fail here - make sure you re prepare your DB [ this was added later]
 items_ctr_beforeAddition = train_data[3]
 n_node = item_Ctr
@@ -155,18 +147,17 @@ for epoch in range(opt.epoch):
             else:
                 mrr.append(1 / (20 - np.where(score == target - 1)[0][0]))
 
-    # todo: What is teh meaning when more then a single prediction among 20 is correct ? (can happen only to aEOSs)
-    hit = np.mean(hit) * 100
-    mrr = np.mean(mrr) * 100
-    test_loss = np.mean(test_loss_)  # todo: We don't want to change the loss with aEOSs
-    if hit >= best_result[0]:
+    hit = np.mean(hit) * 100  # hit is calculating the P@20
+    mrr = np.mean(mrr) * 100  # mrr is calculating the mrr@20
+    test_loss = np.mean(test_loss_)
+    if hit >= best_result[0]: # best P@20 is stored in best_result[0] and it's best epoch at  best_epoch[0]
         best_result[0] = hit
         best_epoch[0] = epoch
-    if mrr >= best_result[1]:
+    if mrr >= best_result[1]: # best mrr@20 is stored in best_result[1] and it's best epoch at  best_epoch[1]
         best_result[1] = mrr
         best_epoch[1] = epoch
 
-    printDebug('train_loss:\t%.4f\ttest_loss:\t%4f\tPrecision@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d' % (
+    printDebug('train_loss:\t%.4f\ttest_loss:\t%4f\tPrecision@20:\t%.4f\tMRR@20:\t%.4f\tEpoch:\t%d,\t%d' % (
         loss, test_loss, best_result[0], best_result[1], best_epoch[0], best_epoch[1]))
     printDebug('actualEOSs:\t%d\tpredictedEOSs:\t%d\tfalsePositiveEOSs:\t%d\tfalseNegativeEOSs\t%d' % (
         actualEOSs, predictedEOSs, falsePositiveEOSs, falseNegativeEOSs))
@@ -181,7 +172,7 @@ finalFileName = 'Main_TF_' + opt.dataset \
                 + '_train_loss_%.4f_' % loss \
                 + '_test_loss_%4f_' % test_loss \
                 + '_Precision20_%.4f_' % best_result[0] \
-                + '_MMR20_%.4f_' % best_result[1] \
+                + '_MRR20_%.4f_' % best_result[1] \
                 + '_Epoch_%d_' % best_epoch[0] \
                 + '_bestEpoch_%d' % best_epoch[1] \
                 + '_Es_' + str(opt.epoch) \

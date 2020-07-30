@@ -5,41 +5,58 @@ Created on July, 2018
 @author: Tangrizzly
 @updated : Gil Shamay and Alex Danieli
 """
-import random
 import argparse
-import time
 import csv
-import pickle
 import operator
-import datetime
-import os
-from enum import Enum
+import pickle
+import random
+import time
+
 from printDebug import *
-import matplotlib.pyplot as plt
 
 random.seed(1)
 
-# todo: [GS] added headers in youchoose clicks - session_id,timestamp,item_id,ccategory
-# todo: [GS] add here end of session nodes EOS
-# todo: should we look for the eos as a standard node ? change the validation to include last session, w/o the eos  ?
+# Before running you must upadte the headers in youchoose clicks:
+#   session_id,timestamp,item_id,ccategory (they are missing in the original data)
 # the only used info from the data is the session and item IDs and the time/date
+#
+# This code generate the data to be used by the main.py
+# it read the dataset and generate the train and test data files
+# according to the specification given in the input parameter
+# the input is the base dataset file and the parameters as described below
+# the output of this code is one or more directories that will be named by the databse and it's different setting
+# this directory will be the input of teh main.py
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
 parser.add_argument('--minItemUsage', default='5', help='min item usage to be added to the graph, default is 5')
 parser.add_argument('--minSeqLen', default='2', help='min seq length to be added to the graph. default is 2')
+
+# if this value is set the aEOS are added to the TRAIN data
 parser.add_argument('--EOS', default='0',
-                    help='the rate of the EOS insertion ; 0 adds nothing 1 add EOS for every real end, default is 0')
+                    help='the rate of the EOS insertion, '
+                         + '0 adds nothing '
+                         + '1 add EOS for every real end, '
+                         + 'default is 0')
+
+# if this value is set the aEOS are added to the TRAIN data
 parser.add_argument('--EOSNum', default='0',
-                    help='the actual number of aEOSs that will be added; 0 adds nothing ; '
-                         + 'this value overide the EOS ; default is 0')
+                    help='the actual number of aEOSs that will be added, '
+                         + '0 adds nothing ; '
+                         + 'this value overide the EOS ; '
+                         + 'default is 0')
+
+# if this value is set the aEOS are added to the TEST data
 parser.add_argument('--EvalEOS', default='false',
                     help='(true) if evaluation should be done on all items, including last'
                          + 'or (false) if should be done on all, except the last item in the seq, '
                          + 'as in the original code; default is false')
+
+# if this value is set the aEOS are added ONLY to the TEST data
 parser.add_argument('--EvalEOSTestOnly', default='false',
                     help='(true) if evaluation should be done on all items, including last on the test only'
-                         + 'or (false) if should be done on all, except the last item in the seq, '
+                         + 'or (false) if should be done as defined by the above parameters '
                          + 'This is to check the original code running on ALL data')
+
 opt = parser.parse_args()
 printDebug("opt=" + str(opt))
 
@@ -54,7 +71,7 @@ elif opt.dataset == 'yoochoose':
     dataset = 'yoochoose-clicks.dat'
 
 minItemUsage = int(opt.minItemUsage)
-if minItemUsage <= 0:  # todo: Check if not nan
+if minItemUsage <= 0:
     printDebug("bad minItemUsage value [" + opt.minItemUsage + "] setting to 5")
     minItemUsage = 5
 printDebug("minItemUsage[" + str(minItemUsage) + "]")
@@ -153,7 +170,6 @@ with open(dataset, "r") as f:
 
     date = ''
     if opt.dataset == 'yoochoose':
-        # todo: [GS] yoochoose is sorted ?
         date = time.mktime(time.strptime(curdate[:19], '%Y-%m-%dT%H:%M:%S'))
     else:
         date = time.mktime(time.strptime(curdate, '%Y-%m-%d'))
@@ -162,7 +178,6 @@ with open(dataset, "r") as f:
             sorted_clicks = sorted(sess_clicks[i], key=operator.itemgetter(1))
             sess_clicks[i] = [c[0] for c in sorted_clicks]
 
-    # todo: [GS] it is needed run only at the last session - bcz the last session date is not set (bcz there is no 'session switch')
     sess_date[curid] = date
 printDebug("-- Reading data @ %ss" % datetime.datetime.now())
 
@@ -183,13 +198,15 @@ for s in sess_clicks:
         else:
             iid_counts[iid] = 1
 
-sorted_counts = sorted(iid_counts.items(), key=operator.itemgetter(1))  # todo: [GS] what is this used for ?
+sorted_counts = sorted(iid_counts.items(), key=operator.itemgetter(1))  # var not in use
 length = len(sess_clicks)
 for s in list(sess_clicks):
     curseq = sess_clicks[s]
-    filseq = list(filter(lambda i: iid_counts[i] >= minItemUsage, curseq))
-    if len(filseq) < minSeqLen:  # todo: [GS] keep only ids that were clicked 5 times or more
-        # todo: [GS] filter out sessions that has less then minSeqLen (defaulte is) 2 clics that appeard less then minItemUsage(default is 5) times (session become len 1)
+    filseq = list(filter(lambda i: iid_counts[i] >= minItemUsage,
+                         curseq))  # filter out items that appeard less then minItemUsage(default is 5) times
+    if len(filseq) < minSeqLen:
+        # keep only ids that were clicked minSeqLen (default is 2) times or more
+        # filter out sessions that has less then minSeqLen clicks
         del sess_clicks[s]
         del sess_date[s]
         filteredOutSeq += 1
@@ -260,7 +277,6 @@ def obtian_tra():
         train_dates += [date]
         train_seqs += [outseq]
     printDebug("number of items[" + str(item_ctr) + "]")  # 43098, 37484
-    # todo: Add here num of Session End items
     return train_ids, train_dates, train_seqs, item_ctr
 
 
@@ -447,7 +463,7 @@ for seq in tes_seqs:
     all += len(seq)
     allTest += len(seq)
 
-printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  # todo: those values are BEFORE adding the sub Seqs
+printDebug('avg Train: ' + str(allTarin / (len(tra_seqs) * 1.0)))  # those values are BEFORE adding the sub Seqs
 printDebug('avg Test: ' + str(allTest / (len(tes_seqs) * 1.0)))
 printDebug('avg length - all: ' + str(all / (len(tra_seqs) + len(tes_seqs) * 1.0)))
 
@@ -493,12 +509,11 @@ else:
     pickle.dump(tra, open('sample' + pathExt + '/train.txt', 'wb'))
     pickle.dump(tes, open('sample' + pathExt + '/test.txt', 'wb'))
     pickle.dump(tra_seqs, open('sample' + pathExt + '/all_train_seq.txt', 'wb'))  # not in use
-    # todo: Why do we keep the tra_seqs? (the original seq before the sub seq)
-    #  Not sure how they could be used. We can see that they are not in use by the main
+    # tra_seqs - var not in use (the original seq before the sub seq)
 
 End = datetime.datetime.now()
 dateEndString = End.strftime("%Y-%m-%d-%H-%M-%S")
 printDebug('Done @' + dateEndString + " took " + str(End - Start))
 printToFile()
 
-# todo: not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids
+# vars not in use: tra_ids, tes_ids, seq4, seq64, tra_seqs, tr_dates, tr_ids te_dates,te_ids
