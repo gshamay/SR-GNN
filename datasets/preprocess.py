@@ -228,7 +228,7 @@ for _, date in dates:
     if maxdate < date:
         maxdate = date
 
-# 7 days for test # take the last 1 day from yoochosse or teh last 7 days of other dbs, and use them as the test
+# 7 days for test # take the last 1 day from yoochosse or the last 7 days of other dbs, and use them as the test
 splitdate = 0
 if opt.dataset == 'yoochoose':
     splitdate = maxdate - 86400 * 1  # the number of seconds for a day：86400 60sec*60Min*24hours
@@ -306,13 +306,13 @@ tes_ids, tes_dates, tes_seqs = obtian_tes()
 
 ##############################################
 # find how often the same EOS item is used ; there may some that are 'natural' EOS (like checkout page)
-# this must be done on teh train only - we can't know in the test what is the EOS
+# this must be done on the train only - we can't know in the test what is the EOS
 # however we should add the aEOSs (artificial EOSs) to the test
 # and this must be done before adding sub sequences
 
 iid_EOS_counts = {}  # item --> Count num of times that the item was used as EOS
 for curseq in tra_seqs:
-    # count the number of times that item appear as teh item in teh seq
+    # count the number of times that item appear as the item in the seq
     lastItemInSession = curseq[len(curseq) - 1]
     if lastItemInSession in iid_EOS_counts:
         iid_EOS_counts[lastItemInSession] += 1

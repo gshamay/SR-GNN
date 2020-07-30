@@ -6,7 +6,7 @@ This is the code was originally developed for the AAAI 2019 Paper: [Session-base
 
 It was updated by Gil Shamay(gshamay@gmail.com) and Alex Danieli (alex.daniels85@gmail.com)
 
-RecSys course project, Spring 2020, Ben Gurion University of teh Negev, Israel
+RecSys course project, Spring 2020, Ben Gurion University of the Negev, Israel
 
 The original code is located @ https://github.com/CRIPAC-DIG/SR-GNN
 
@@ -67,7 +67,7 @@ optional arguments:
 ```
 the preprocess generate a directory with data files, in .\datasets\ directory
 
-the directory name will contain some of teh optional parameters
+the directory name will contain some of the optional parameters
 
 for example: datasets\digineticaEOS_0.0_EOSNum_1_EvalEOS_False_bEvalEOSTestOnly_False
 
