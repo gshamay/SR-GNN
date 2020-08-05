@@ -122,6 +122,9 @@ optional arguments:
 ## Requirements
 
 - Python 3
+tensorflow
+matplotlib
+numpy
 
 
 ## Citation
