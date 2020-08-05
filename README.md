@@ -22,7 +22,7 @@ Here are two datasets we used in our paper. After downloaded the datasets, you c
 
 - YOOCHOOSE: <http://2015.recsyschallenge.com/challenge.html>
 
-- DIGINETICA: <http://cikm2016.cs.iupui.edu/cikm-cup>
+- DIGINETICA: <https://competitions.codalab.org/competitions/11161#learn_the_details-data2> (used to be availiable at <http://cikm2016.cs.iupui.edu/cikm-cup>)
 
 There is a small dataset `sample` included in the folder `datasets/`, which can be used to test the correctness of the code.
 
